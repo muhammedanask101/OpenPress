@@ -2,21 +2,21 @@ import { useState, useEffect } from "react"
 import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import { login, reset } from '../slices/authSlice'
+import { login, reset } from '../slices/userSlice'
 import FallbackLoading from "./FallbackLoading"
 
-const AdminSignIn = () => {
+const UserLogIn = () => {
     const [formData, setFormData] = useState({ email: '', password: ''})
     const { email, password } = formData
     const navigate = useNavigate()
     const dispatch = useDispatch()
-    const { admin, isLoading, isError, isSuccess, message } = useSelector(state => state.auth)
+    const { user, isLoading, isError, isSuccess, message } = useSelector(state => state.users)
 
     useEffect(() => {
         if (isError) toast.error(message)
-        if (isSuccess || admin) navigate('/admin')
+        if (isSuccess || user) navigate('/')
         dispatch(reset())
-     }, [admin, isError, isSuccess, message, navigate, dispatch])
+     }, [user, isError, isSuccess, message, navigate, dispatch])
 
     const onChange = e => {
         setFormData(prevState => ({
@@ -27,10 +27,10 @@ const AdminSignIn = () => {
 
     const onSubmit = (e) => {
         e.preventDefault();
-        const adminData = { email, password }
-        dispatch(login(adminData)).unwrap().then(
+        const userData = { email, password }
+        dispatch(login(userData)).unwrap().then(
             () => {
-                navigate("/admin");
+                navigate("/");
             }
         ).catch(err => {
             console.error(err);
@@ -40,7 +40,7 @@ const AdminSignIn = () => {
     return (
         isLoading ? <FallbackLoading /> : (
         <>
-        <h1 className='text-3xl md:text-5xl font-bold text-blue-100 mb-15 p-2 mt-2 text-center text-shadow-md text-shadow-black'>Admin Login</h1>
+        <h1 className='text-3xl md:text-5xl font-bold text-blue-100 mb-15 p-2 mt-2 text-center text-shadow-md text-shadow-black'>User Login</h1>
         <section className="flex justify-center p-6">
             <form onSubmit={onSubmit} className="shadow-md shadow-black rounded-lg p-6 w-full max-w-md space-y-4">
                 <div className="flex flex-col gap-2 w-full">
@@ -66,4 +66,4 @@ const AdminSignIn = () => {
         )
 }
 
-export default AdminSignIn;
+export default UserLogIn;

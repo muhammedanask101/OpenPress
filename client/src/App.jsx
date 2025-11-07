@@ -6,6 +6,8 @@ const Home = lazy(() => import('./pages/Home'));
 const Projects = lazy(() => import('./pages/ProjectList'));
 const Contact = lazy(() => import('./pages/AskMe'));
 const AdminLogin = lazy(() => import('./pages/AdminLogin'));
+const Login = lazy(() => import('./pages/Login'));
+const Register = lazy(() => import('./pages/Register'));
 const Admin = lazy(() => import('./pages/Admin'));
 const EditProject = lazy(() => import('./pages/EditProject'));
 import './index.css'
@@ -20,6 +22,8 @@ function App() {
           <main className='flex-grow p-4'>
             <Suspense fallback={<FallbackLoading />}>
               <Routes>
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
                 <Route path="/" element={<Home />} />
                 <Route path="/projects" element={<Projects />} />
                 <Route path="/contact" element={<Contact />} />
