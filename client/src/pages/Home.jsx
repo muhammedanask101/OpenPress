@@ -6,11 +6,11 @@ import { useEffect } from "react";
 const Home = () => {
 
     const navigate = useNavigate();
-    const { admin } = useSelector(state => state.auth);
+    const { user } = useSelector(state => state.users);
 
     useEffect(() => {
-        if (!admin) navigate('/adminlogin')
-    }, [admin, navigate])
+        if (!user) navigate('/login')
+    }, [user, navigate])
 
     return(
         <HomeSection />

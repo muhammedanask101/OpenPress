@@ -1,2 +1,7 @@
 {projects.length > 0 && (<div> {projects.map( project => <Project key={project._id} project={project}/>)} </div>)}
 projectarray
+
+<a href="https://discord.gg/txNPEJd9Gy" target="_blank" rel="noopener noreferrer" className="hover:text-cyan-50">Discord</a>
+
+remove user routes
+

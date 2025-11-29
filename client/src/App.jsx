@@ -3,13 +3,13 @@ import { lazy, Suspense } from "react"
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 const Home = lazy(() => import('./pages/Home'));
-const Projects = lazy(() => import('./pages/ProjectList'));
+const Articles = lazy(() => import('./pages/ArticleList'));
 const Contact = lazy(() => import('./pages/AskMe'));
 const AdminLogin = lazy(() => import('./pages/AdminLogin'));
 const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
 const Admin = lazy(() => import('./pages/Admin'));
-const EditProject = lazy(() => import('./pages/EditProject'));
+const EditArticle = lazy(() => import('./pages/EditArticle'));
 import './index.css'
 import FallbackLoading from './components/FallbackLoading';
 
@@ -25,11 +25,11 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/" element={<Home />} />
-                <Route path="/projects" element={<Projects />} />
+                <Route path="/articles" element={<Articles />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/adminlogin" element={<AdminLogin />} />
                 <Route path="/admin" element={<Admin />} />
-                <Route path="/admin/projects/:id/edit" element={<EditProject />} />
+                <Route path="/user/articles/:id/edit" element={<EditArticle />} />
               </Routes>
             </Suspense>
           </main>

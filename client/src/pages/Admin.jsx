@@ -1,4 +1,4 @@
-import ProjectForm from "../components/projectForm";
+import ArticleForm from "../components/articleForm";
 import DeleteList from "../components/DeleteList";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -16,9 +16,9 @@ export default function Admin() {
         <>
             <section className='heading'>
                 <h1 className="text-3xl md:text-5xl font-bold text-blue-100 mb-15 p-2 mt-2 text-center text-shadow-md text-shadow-black">Welcome {admin && admin.name}</h1>
-                <h1 className="text-lg md:text-xl md:m-5 font-bold text-shadow-md text-shadow-black text-indigo-400">Create a Project:</h1>
+                <h1 className="text-lg md:text-xl md:m-5 font-bold text-shadow-md text-shadow-black text-indigo-400">Create a Article:</h1>
             </section>
-            <ProjectForm />
+            <ArticleForm />
             <DeleteList />
         </>
 )

@@ -1,34 +1,40 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { updateProject, getProjects } from "../slices/ProjectSlice";
+import { updateArticle, getArticles } from "../slices/ArticleSlice";
 
-export default function EditProject() {
+export default function EditArticle() {
     const { id } = useParams();
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const { projects, isLoading } = useSelector(state => state.projects);
+    const { articles, isLoading } = useSelector(state => state.articles);
 
     const [formData, setFormData] = useState({
         title: "",
         description: "",
         fileurl: ""
     });
+    
+    const { user } = useSelector(state => state.auth);
 
     useEffect(() => {
-        if (projects.length === 0) {
-            dispatch(getProjects());
+        if (!user) navigate('/login')
+    }, [user, navigate])
+
+    useEffect(() => {
+        if (articles.length === 0) {
+            dispatch(getArticles());
         } else {
-            const project = projects.find(p => p._id === id);
-            if (project) {
+            const article = articles.find(p => p._id === id);
+            if (article) {
                 setFormData({
-                    title: project.title,
-                    description: project.description,
-                    fileurl: project.fileurl
+                    title: article.title,
+                    description: article.description,
+                    fileurl: article.fileurl
                 });
             }
         }
-    }, [projects, dispatch, id]);
+    }, [articles, dispatch, id]);
 
     const onChange = e => {
         setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -36,15 +42,15 @@ export default function EditProject() {
 
     const onSubmit = e => {
         e.preventDefault();
-        dispatch(updateProject({ id, projectData: formData }));
-        navigate("/projects");
+        dispatch(updateArticle({ id, articleData: formData }));
+        navigate("/articles");
     };
 
     if (isLoading) return <p>Loading...</p>;
 
     return (
         <>
-        <h1 className="text-3xl font-bold text-amber-100 mb-10 p-2 mt-2 text-center text-shadow-md text-shadow-black">Edit Project</h1>
+        <h1 className="text-3xl font-bold text-amber-100 mb-10 p-2 mt-2 text-center text-shadow-md text-shadow-black">Edit Article</h1>
         <section className="flex justify-center p-1">
             <form onSubmit={onSubmit} className="shadow-md shadow-black rounded-lg p-6 w-full max-w-md space-y-4">
                 <div className="flex flex-col gap-2 w-full">

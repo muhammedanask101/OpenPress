@@ -1,23 +1,23 @@
 import axios from 'axios';
-const API_URL = '/api/projects/';
+const API_URL = '/api/articles/';
 
-const createProject = async (projectData, token) => {
+const createArticle = async (articleData, token) => {
     const config = {
         headers: {
             Authorization: `Bearer ${token}`
         }
     }
     
-    const response = await axios.post(API_URL, projectData, config);
+    const response = await axios.post(API_URL, articleData, config);
     return response.data;
 }
 
-const getProject = async () => {
+const getArticle = async () => {
     const response = await axios.get(API_URL);
     return response.data;
 }
 
-const deleteProject = async (id, token) => {
+const deleteArticle = async (id, token) => {
     const config = {
         headers: {
             Authorization: `Bearer ${token}`
@@ -27,15 +27,15 @@ const deleteProject = async (id, token) => {
     return response.data;
 } 
 
-const updateProject = async (id, projectData, token) => {
+const updateArticle = async (id, articleData, token) => {
     const config = {
         headers: {
             Authorization: `Bearer ${token}`
         }
     };
-    const response = await axios.put(`/api/projects/${id}`, projectData, config);
+    const response = await axios.put(`/api/articles/${id}`, articleData, config);
     return response.data;
 };
 
-const projectService = { createProject, getProject, deleteProject, updateProject };
-export default projectService;
+const articleService = { createArticle, getArticle, deleteArticle, updateArticle };
+export default articleService;

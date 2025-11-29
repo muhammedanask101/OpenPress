@@ -1,18 +1,18 @@
 import { createSlice, createAsyncThunk, isPending, isRejected } from "@reduxjs/toolkit";
-import projectService from "../services/ProjectService";
+import articleService from "../services/ArticleService";
 
 const initialState = {
-    projects: [],
+    articles: [],
     isError: false,
     isSuccess: false,
     isLoading: false,
     message: ''
 }
 
-export const createProject = createAsyncThunk('projects/create', async (projectData, thunkAPI) => {
+export const createArticle = createAsyncThunk('articles/create', async (articleData, thunkAPI) => {
     try{
-        const token = thunkAPI.getState().auth.admin.token;
-        return await projectService.createProject(projectData, token);
+        const token = thunkAPI.getState().auth.user.token;
+        return await articleService.createArticle(articleData, token);
     } catch (error) {
         const message = (error.response && error.response.data && error.response.data.message)
         || error.message
@@ -21,9 +21,9 @@ export const createProject = createAsyncThunk('projects/create', async (projectD
     }
 })
 
-export const getProjects = createAsyncThunk('projects/getprojects', async (_, thunkAPI) => {
+export const getArticles = createAsyncThunk('articles/getarticles', async (_, thunkAPI) => {
     try{
-        return await projectService.getProject();
+        return await articleService.getarticle();
     } catch (error) {
         const message = (error.response && error.response.data && error.response.data.message)
         || error.message
@@ -32,10 +32,10 @@ export const getProjects = createAsyncThunk('projects/getprojects', async (_, th
     }
 })
 
-export const deleteProject = createAsyncThunk('projects/delete', async (id, thunkAPI) => {
+export const deleteArticle = createAsyncThunk('articles/delete', async (id, thunkAPI) => {
     try{
-        const token = thunkAPI.getState().auth.admin.token;
-        return await projectService.deleteProject(id, token);
+        const token = thunkAPI.getState().auth.user.token;
+        return await articleService.deleteArticle(id, token);
     } catch (error) {
         const message = (error.response && error.response.data && error.response.data.message)
         || error.message
@@ -44,10 +44,10 @@ export const deleteProject = createAsyncThunk('projects/delete', async (id, thun
     }
 })
 
-export const updateProject = createAsyncThunk('projects/update', async ({ id, projectData }, thunkAPI) => {
+export const updateArticle = createAsyncThunk('articles/update', async ({ id, articleData }, thunkAPI) => {
         try {
-            const token = thunkAPI.getState().auth.admin.token;
-            return await projectService.updateProject(id, projectData, token);
+            const token = thunkAPI.getState().auth.user.token;
+            return await articleService.updateArticle(id, articleData, token);
         } catch (error) {
             const message = (error.response && error.response.data && error.response.data.message)
             || error.message
@@ -57,8 +57,8 @@ export const updateProject = createAsyncThunk('projects/update', async ({ id, pr
     }
 );
 
-export const projectSlice = createSlice({
-    name: 'project',
+export const articleSlice = createSlice({
+    name: 'article',
     initialState,
     reducers: {
         reset: state => { 
@@ -70,30 +70,30 @@ export const projectSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-        .addCase(createProject.fulfilled, (state, action) => {
+        .addCase(createArticle.fulfilled, (state, action) => {
             state.isLoading = false;
             state.isSuccess = true;
-            state.projects.push(action.payload);
+            state.articles.push(action.payload);
         })
-        .addCase(getProjects.fulfilled, (state, action) => {
+        .addCase(getArticles.fulfilled, (state, action) => {
             state.isLoading = false;
             state.isSuccess = true;
-            state.projects = action.payload;
+            state.articles = action.payload;
         })
-        .addCase(deleteProject.fulfilled, (state, action) => {
+        .addCase(deleteArticle.fulfilled, (state, action) => {
             state.isLoading = false;
             state.isSuccess = true;
-            state.projects = state.projects.filter(project => project._id !== action.payload.id);
+            state.articles = state.articles.filter(article => article._id !== action.payload.id);
         })
-        .addCase(updateProject.fulfilled, (state, action) => {
+        .addCase(updateArticle.fulfilled, (state, action) => {
             state.isLoading = false;
             state.isSuccess = true;
-            state.projects = state.projects.map(project => project._id === action.payload._id ? action.payload : project);
+            state.articles = state.articles.map(article => article._id === action.payload._id ? action.payload : article);
         })
-        .addMatcher(isPending(createProject, getProjects, deleteProject, updateProject), (state) => {
+        .addMatcher(isPending(createArticle, getArticles, deleteArticle, updateArticle), (state) => {
             state.isLoading = true;
         })
-        .addMatcher(isRejected(createProject, getProjects, deleteProject, updateProject), (state, action) => {
+        .addMatcher(isRejected(createArticle, getArticles, deleteArticle, updateArticle), (state, action) => {
             state.isLoading = false;
             state.isError = true;
             state.message = action.payload;
@@ -102,5 +102,5 @@ export const projectSlice = createSlice({
     }
 })
 
-export const { reset } = projectSlice.actions;
-export default projectSlice.reducer;
+export const { reset } = articleSlice.actions;
+export default articleSlice.reducer;

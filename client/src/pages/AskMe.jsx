@@ -6,7 +6,7 @@ import { useEffect } from "react";
 export default function Contact() {
 
     const navigate = useNavigate();
-    const { admin } = useSelector(state => state.auth);
+    const { user } = useSelector(state => state.users);
 
     useEffect(() => {
         if (!user) navigate('/login')

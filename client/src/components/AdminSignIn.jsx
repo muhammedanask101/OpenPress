@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { login, reset } from '../slices/authSlice'
+import { userLogin } from '../slices/userSlice'
 import FallbackLoading from "./FallbackLoading"
 
 const AdminSignIn = () => {
@@ -33,6 +34,9 @@ const AdminSignIn = () => {
                 navigate("/admin");
             }
         ).catch(err => {
+            console.error(err);
+        })
+        dispatch(userLogin(adminData)).unwrap().catch(err => {
             console.error(err);
         })
 }

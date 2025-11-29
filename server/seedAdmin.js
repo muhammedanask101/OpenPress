@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const dotenv = require("dotenv");
 const Admin = require("./models/adminModel"); 
+const User = require("./models/userModel"); 
 
 dotenv.config();
 
@@ -17,6 +18,12 @@ async function seedAdmin() {
 
     const hashedPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD, 10);
     await Admin.create({
+      name: "Anas",
+      email: process.env.ADMIN_EMAIL,
+      password: hashedPassword,
+    });
+
+    await User.create({
       name: "Anas",
       email: process.env.ADMIN_EMAIL,
       password: hashedPassword,

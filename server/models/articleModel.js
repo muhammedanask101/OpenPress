@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const projectSchema = mongoose.Schema(
+const articleSchema = mongoose.Schema(
 {
     title: {
         type: String,
@@ -25,4 +25,4 @@ const projectSchema = mongoose.Schema(
 } 
 )
 
-module.exports = mongoose.model('Project', projectSchema);
+module.exports = mongoose.model('Project', articleSchema);
