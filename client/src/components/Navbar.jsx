@@ -19,6 +19,7 @@ const Navbar = () => {
     dispatch(reset());
     dispatch(userLogout());
     dispatch(reset());
+    setIsOpen(false);
     navigate("/adminlogin");
   };
 
@@ -29,44 +30,62 @@ const Navbar = () => {
       dispatch(logout());
       dispatch(reset());
     }
+    setIsOpen(false);
     navigate("/login");
   };
 
   return (
-    <nav className="bg-black text-amber-100 p-3 md:p-6 shadow-md/80 shadow-blue-300">
+    <nav className="bg-white text-black p-3 md:p-6 shadow-md/80 shadow-black">
       <div className="flex justify-between items-center">
-        <div className="font-bold text-[16px] md:text-[22px] tracking-wide">
-          Kerala Muslims
+        <div className="md:font-extrabold font-bold text-sm md:ml-4 md:text-2xl text-shadow-sm shadow-black tracking-wide">
+          <Link to="/">Kerala Muslims</Link>
         </div>
 
-        <div className="hidden md:flex text-[22px] space-x-4">
-          { user && <Link to="/" className="hover:text-cyan-50">Home</Link> }
-          { user && <Link to="/articles" className="hover:text-cyan-50">Articles</Link> }
-          { user && <Link to="/contact" className="hover:text-cyan-50">Contact</Link> }
-          { !user && location.pathname.startsWith("/login") && <Link to="/register" className="hover:text-cyan-50 font-bold">Register</Link> }
-          { !user && location.pathname.startsWith("/register") && <Link to="/login" className="hover:text-cyan-50 font-bold">Login</Link> }
+        <div className="hidden md:flex mr-4 text-2xl text-shadow-sm shadow-black font-bold space-x-4">
+          { user && <Link to="/home" className="hover:text-blue-700">Home</Link> }
+          { /* user && <Link to="/articles" className="hover:text-blue-700">Articles</Link> */ }
+          { user && <Link to="/contact" className="hover:text-blue-700">Contact</Link> }
+          { !user && (location.pathname.startsWith("/login") || location.pathname.startsWith("/register")) && <Link to="/" className="hover:text-blue-700 font-bold">Home</Link>}
+          { !user && location.pathname.startsWith("/login") && <Link to="/register" className="hover:text-blue-700 font-bold">Register</Link> }
+          { !user && location.pathname.startsWith("/register") && <Link to="/login" className="hover:text-blue-700 font-bold">Login</Link> }
+          { !user && location.pathname.startsWith("/") && !(location.pathname.startsWith("/login") || location.pathname.startsWith("/register")) && <Link to="/login" className="hover:text-blue-700 font-bold">Login</Link> }
+          { !user && location.pathname.startsWith("/") && !(location.pathname.startsWith("/login") || location.pathname.startsWith("/register")) && <Link to="/register" className="hover:text-blue-700 font-bold">Register</Link> }
           {user && admin && !(location.pathname.startsWith("/admin")) &&
-          <Link to="/admin" className="hover:text-cyan-50">Admin</Link>}
+          <Link to="/admin" className="hover:text-yellow-500">Admin</Link>}
           {admin && location.pathname.startsWith("/admin") && 
           ( <button onClick={handleLogout} className='hover:text-red-500 transition'>Logout</button> )}
           {user && !(location.pathname.startsWith("/admin")) &&
           ( <button onClick={handleUserLogout} className='hover:text-red-500 transition'>Logout</button> )}
         </div>
 
-        <div className="md:hidden">
-          <button onClick={() => setIsOpen(!isOpen)}>
-            {isOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+        <div className="md:hidden text-[13px] text-shadow-sm shadow-black mr-2">
+          <div className='space-x-2'>
+            <button onClick={() => setIsOpen(!isOpen)}>
+              {isOpen && <X size={24} />}
+            </button>
+            <button onClick={() => setIsOpen(!isOpen)}>
+              {!isOpen && user && <Menu size={24} />}
+            </button>
+            {!isOpen && !user && (location.pathname.startsWith("/login") || location.pathname.startsWith("/register")) && <Link to="/" className="hover:text-cyan-50 font-bold">Home</Link>}
+            {!isOpen && !user && location.pathname.startsWith("/login") && <Link to="/register" className="hover:text-cyan-50 font-bold">Register</Link>}
+            {!isOpen && !user && location.pathname.startsWith("/register") && <Link to="/login" className="hover:text-cyan-50 font-bold">Login</Link>}
+            {!isOpen && !user && location.pathname.startsWith("/") && !(location.pathname.startsWith("/login") || location.pathname.startsWith("/register")) && <Link to="/login" className="hover:text-cyan-50 font-bold">Login</Link>}
+            {!isOpen && !user && location.pathname.startsWith("/") && !(location.pathname.startsWith("/login") || location.pathname.startsWith("/register")) && <Link to="/register" className="hover:text-cyan-50 font-bold">Register</Link>}
+          </div>
         </div>
       </div>
 
       {isOpen && (
         <div className="md:hidden flex flex-col mt-2 text-[14px] space-y-2">
-          <Link to="/" className="hover:text-cyan-50" onClick={() => setIsOpen(false)}>Home</Link>
-          <Link to="/articles" className="hover:text-cyan-50" onClick={() => setIsOpen(false)}>Articles</Link>
+          <Link to="/home" className="hover:text-cyan-50" onClick={() => setIsOpen(false)}>Home</Link>
+          {/* <Link to="/articles" className="hover:text-cyan-50" onClick={() => setIsOpen(false)}>Articles</Link> */}
           <Link to="/contact" className="hover:text-cyan-50" onClick={() => setIsOpen(false)}>Contact</Link>
+          {user && admin && !(location.pathname.startsWith("/admin")) &&
+            <Link to="/admin" className="hover:text-cyan-50">Admin</Link>}
           {admin && location.pathname.startsWith("/admin") && 
-          ( <button onClick={handleLogout} className='text-left hover:text-red-500 transition'>Logout</button> )}
+            ( <button onClick={handleLogout} className='text-left hover:text-red-500 transition'>Logout</button> )}
+          {user && !(location.pathname.startsWith("/admin")) &&
+            ( <button onClick={handleUserLogout} className='hover:text-red-500 transition'>Logout</button> )}
         </div>
       )}
     </nav>
