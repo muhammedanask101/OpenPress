@@ -1,5 +1,6 @@
 import axios from 'axios';
-const API_URL = '/api/articles/';
+const API_URL = import.meta.env.VITE_BACKEND_URL + '/api/admin/';
+
 
 const createArticle = async (articleData, token) => {
     const config = {
