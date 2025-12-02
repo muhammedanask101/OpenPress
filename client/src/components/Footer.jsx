@@ -2,7 +2,7 @@ import { FaGithub } from "react-icons/fa";
 
 const Footer = () => {
     return(
-            <div className="flex justify-between bg-[#0D0D0D] p-3 md:p-6 text-[11px] md:text-[15px] font-bold text-amber-100">
+            <div className="flex justify-between bg-[#0D0D0D] p-3 md:p-6 text-[13px] md:text-[15px] font-bold text-amber-100">
                 <div className="font-mplus flex items-center gap-2">
                     <p>A Non-Profit Organization </p>
                 </div>

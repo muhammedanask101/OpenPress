@@ -37,7 +37,7 @@ const Navbar = () => {
   return (
     <nav className="bg-white text-black p-3 md:p-6 shadow-md/80 shadow-black">
       <div className="flex justify-between items-center">
-        <div className="md:font-extrabold font-bold text-sm md:ml-4 md:text-2xl text-shadow-sm shadow-black tracking-wide">
+        <div className="md:font-extrabold font-bold text-lg md:ml-4 md:text-2xl text-shadow-sm shadow-black tracking-wide">
           <Link to="/">Kerala Muslims</Link>
         </div>
 
@@ -58,7 +58,7 @@ const Navbar = () => {
           ( <button onClick={handleUserLogout} className='hover:text-red-500 transition'>Logout</button> )}
         </div>
 
-        <div className="md:hidden text-[13px] text-shadow-sm shadow-black mr-2">
+        <div className="md:hidden text-md text-shadow-sm shadow-black mr-2">
           <div className='space-x-2'>
             <button onClick={() => setIsOpen(!isOpen)}>
               {isOpen && <X size={24} />}
