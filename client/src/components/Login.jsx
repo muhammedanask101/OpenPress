@@ -39,7 +39,7 @@ const UserLogIn = () => {
 
     return (
         isLoading ? <FallbackLoading /> : (
-        <>
+        <div>
         <h1 className='text-2xl md:text-5xl font-bold text-black border-black mt-5 mb-2 p-2 text-center text-shadow-md'>User Login</h1>
         <section className="flex justify-center p-6">
             <form onSubmit={onSubmit} className="text-[12px] md:text-sm shadow-md shadow-black rounded-lg bg-red-700 p-3 md:p-6 w-full max-w-md space-y-1 md:space-y-4">
@@ -63,7 +63,7 @@ const UserLogIn = () => {
                     <button className="flex w-full justify-center mt-2 bg-yellow-500 text-white font-semibold font-google-sans py-2 px-4 rounded-md hover:bg-sky-700 transition duration-200" type='submit'>Login</button>
             </form>
         </section>
-        </>
+        </div>
     )
 
         )

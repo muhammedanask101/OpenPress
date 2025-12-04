@@ -35,7 +35,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-white text-black p-3 md:p-6 shadow-md/80 shadow-black">
+    <nav className="bg-white text-black p-3 md:p-6 border-b border-black md:border-b-2">
       <div className="flex justify-between items-center">
         <div className="md:font-extrabold font-bold text-lg md:ml-4 md:text-2xl text-shadow-sm shadow-black tracking-wide">
           <Link to="/">Kerala Muslims</Link>
@@ -43,7 +43,7 @@ const Navbar = () => {
 
         <div className="hidden md:flex mr-4 text-2xl text-shadow-sm shadow-black font-bold space-x-4">
           { user && <Link to="/home" className="hover:text-blue-700">Home</Link> }
-          { /* user && <Link to="/articles" className="hover:text-blue-700">Articles</Link> */ }
+          { user && <Link to="/articles" className="hover:text-blue-700">Articles</Link> }
           { user && <Link to="/contact" className="hover:text-blue-700">Contact</Link> }
           { !user && (location.pathname.startsWith("/login") || location.pathname.startsWith("/register")) && <Link to="/" className="hover:text-blue-700 font-bold">Home</Link>}
           { !user && location.pathname.startsWith("/login") && <Link to="/register" className="hover:text-blue-700 font-bold">Register</Link> }
@@ -78,7 +78,7 @@ const Navbar = () => {
       {isOpen && (
         <div className="md:hidden flex flex-col mt-2 text-[14px] space-y-2">
           <Link to="/home" className="hover:text-cyan-50" onClick={() => setIsOpen(false)}>Home</Link>
-          {/* <Link to="/articles" className="hover:text-cyan-50" onClick={() => setIsOpen(false)}>Articles</Link> */}
+          <Link to="/articles" className="hover:text-cyan-50" onClick={() => setIsOpen(false)}>Articles</Link>
           <Link to="/contact" className="hover:text-cyan-50" onClick={() => setIsOpen(false)}>Contact</Link>
           {user && admin && !(location.pathname.startsWith("/admin")) &&
             <Link to="/admin" className="hover:text-cyan-50">Admin</Link>}

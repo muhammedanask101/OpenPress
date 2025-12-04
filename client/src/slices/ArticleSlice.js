@@ -23,7 +23,7 @@ export const createArticle = createAsyncThunk('articles/create', async (articleD
 
 export const getArticles = createAsyncThunk('articles/getarticles', async (_, thunkAPI) => {
     try{
-        return await articleService.getarticle();
+        return await articleService.getArticle();
     } catch (error) {
         const message = (error.response && error.response.data && error.response.data.message)
         || error.message
