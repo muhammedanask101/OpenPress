@@ -106,20 +106,23 @@ const articleUpdate = Joi.object({
 
 
 const questionCreate = Joi.object({
-  question: Joi.string().min(5).max(100).required(),
+  question: Joi.string()
+    .min(5)
+    .max(150)
+    .required(),
   context: Joi.string().max(5000).allow('', null),
   tags: Joi.array().items(Joi.string().max(50)).max(10).default([])
 });
 
 const answerCreate = Joi.object({
-  question: objectId().required(),   
+  question: objectId().required(),
   body: Joi.string().min(1).max(10000).required()
 });
 
 
 const commentCreate = Joi.object({
-  itemType: Joi.string().valid('article', 'question', 'answer').required(),
-  itemId: objectId().required(),
+  user: objectId().required(),
+  article: objectId().required(),
   parent: objectId().allow(null).optional(),
   body: Joi.string().min(1).max(5000).required()
 });
@@ -160,7 +163,7 @@ const badgeCreate = Joi.object({
   iconUrl: Joi.string().uri().allow('', null),
   autoAward: Joi.object({
     enabled: Joi.boolean().default(false),
-    rule: Joi.any() 
+    rule: Joi.any()
   }).default({ enabled: false })
 });
 
@@ -183,7 +186,6 @@ const siteSettingsUpdate = Joi.object({
   missionStatement: Joi.string().max(2000).optional(),
   features: Joi.object({
     allowRegistrations: Joi.boolean(),
-    allowAnonymousQuestions: Joi.boolean(),
     enableComments: Joi.boolean(),
     enableAnswers: Joi.boolean(),
     enableArticles: Joi.boolean()
@@ -196,6 +198,7 @@ const siteSettingsUpdate = Joi.object({
     bannedKeywords: Joi.array().items(Joi.string().max(100))
   }).optional(),
   social: Joi.object({
+    discord: Joi.string().uri().allow('', null),
     twitter: Joi.string().uri().allow('', null),
     instagram: Joi.string().uri().allow('', null),
     youtube: Joi.string().uri().allow('', null),
@@ -216,6 +219,21 @@ const siteSettingsUpdate = Joi.object({
   }).optional()
 });
 
+const mediaCreate = Joi.object({
+  key: Joi.string().max(500).required(),          
+  url: Joi.string().uri().max(1000).required(),   
+  mimeType: Joi.string().max(100).optional(),
+  size: Joi.number().integer().min(0).optional(),
+  storageProvider: Joi.string()
+    .valid('s3', 'local', 'gcs', 'cloudinary', 'other')
+    .optional(),
+  storageRegion: Joi.string().max(100).allow('', null),
+  usedin: Joi.object({
+    kind: Joi.string().max(100),
+    item: objectId()
+  }).optional()
+});
+
 const schemas = {
   userRegister,
   userLogin,
@@ -232,7 +250,8 @@ const schemas = {
   starToggle,
   badgeCreate,
   badgeAward,
-  siteSettingsUpdate
+  siteSettingsUpdate,
+  mediaCreate 
 };
 
 module.exports = {
