@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 
 const { protect } = require('../middlewares/authMiddleware');
-const { sanitizeMiddleware, validateBody, schemas, } = require('../middleware/sanitizemiddleware');
+const { sanitizeMiddleware, validateBody, schemas, } = require('../middlewares/sanitizeMiddleware');
 
 const badgeController = require('../controllers/badgeController');
 

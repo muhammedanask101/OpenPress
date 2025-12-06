@@ -8,7 +8,7 @@ const reportController = require('../controllers/reportController');
 
 router.use(sanitizeMiddleware);
 
-// ---------- USER ROUTES ----------
+// user
 
 // Create a new report
 router.post( '/createreport', userprotect, validateBody(schemas.reportCreate), reportController.createReport );

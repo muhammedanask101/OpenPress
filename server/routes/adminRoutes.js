@@ -10,8 +10,8 @@ const {
 } = require('../controllers/adminController');
 
 const { protect } = require('../middlewares/authMiddleware');
-const { validateBody, schemas } = require('../middleware/sanitizeMiddleware');
-const { authLimiter } = require('../middleware/ratelimiterMiddleware');
+const { validateBody, schemas } = require('../middlewares/sanitizeMiddleware');
+const { authLimiter } = require('../middlewares/ratelimiterMiddleware');
 
 
 router.post('/login', authLimiter, validateBody(schemas.adminLogin), loginAdmin);
