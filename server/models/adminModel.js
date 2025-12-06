@@ -14,6 +14,7 @@ const adminSchema = new mongoose.Schema(
             type: String,
             required: [true, 'email is required'],
             unique: true,
+            lowercase: true, 
             trim: true,
             match: [/^\S+@\S+\.\S+$/, "Please enter a valid email address"],
             index: true,
@@ -42,7 +43,7 @@ const adminSchema = new mongoose.Schema(
         lastLoginAt: {
             type: Date,
         },
-            lastLoginIp: {
+        lastLoginIp: {
             type: String,
         },
     },

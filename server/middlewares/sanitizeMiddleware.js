@@ -130,7 +130,7 @@ const commentCreate = Joi.object({
 
 const contactCreate = Joi.object({
   name: Joi.string().min(2).max(100).required(),
-  email: Joi.string().email().required(),
+  email: Joi.string().email().lowercase().required(),
   message: Joi.string().min(5).max(5000).required()
 });
 

@@ -3,11 +3,11 @@ const User = require('../models/usermodel')
 const jwt = require('jsonwebtoken');
 
 const generateJWTtoken = (id) => {
-  if (!process.env.JWT_SECRET) {
-    throw new Error('JWT_SECRET is not defined');
+  if (!process.env.USER_JWT_SECRET) {
+    throw new Error('USER_JWT_SECRET is not defined');
   }
 
-  return jwt.sign({ id, type: 'user' }, process.env.JWT_SECRET, { expiresIn: '5d' });
+  return jwt.sign({ id, type: 'user' }, process.env.USER_JWT_SECRET, { expiresIn: '5d' });
 };
 
 const registerUser = asyncHandler(async (req, res) => {

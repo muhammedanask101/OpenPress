@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const contactSchema = mongoose.Schema(
+const contactSchema = new mongoose.Schema(
     {
         name: {
             type: String,
@@ -55,32 +55,32 @@ const contactSchema = mongoose.Schema(
     }
 )
 
-ContactSchema.index({ createdAt: -1 }); 
-ContactSchema.index({ handled: 1, createdAt: -1 });
+contactSchema.index({ createdAt: -1 }); 
+contactSchema.index({ handled: 1, createdAt: -1 });
 
 // preview
-ContactSchema.virtual('excerpt').get(function () {
+contactSchema.virtual('excerpt').get(function () {
   if (!this.message) return '';
   const text = this.message.toString();
   if (text.length <= 120) return text;
   return text.slice(0, 120) + '...';
 });
 
-ContactSchema.methods.markasHandled = async function () {
+contactSchema.methods.markasHandled = async function () {
   this.handled = true;
   this.handledAt = new Date();
   await this.save();
   return this;
 };
 
-ContactSchema.statics.findUnhandled = function ({ page = 1, limit = 20 } = {}) {
+contactSchema.statics.findUnhandled = function ({ page = 1, limit = 20 } = {}) {
   return this.find({ handled: false })
     .sort({ createdAt: -1 })
     .skip((page - 1) * limit)
     .limit(limit);
 };
 
-ContactSchema.pre('save', function (next) {
+contactSchema.pre('save', function (next) {
   if (typeof this.message === 'string') {
     this.message = this.message.replace(/\s+/g, ' ').trim();
   }
