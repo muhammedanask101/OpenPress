@@ -135,12 +135,19 @@ const answerCreate = Joi.object({
   body: Joi.string().min(1).max(10000).required()
 });
 
+const answerUpdate = Joi.object({
+  body: Joi.string().min(1).max(10000).required()
+});
+
 
 const commentCreate = Joi.object({
-  user: objectId().required(),
   article: objectId().required(),
   parent: objectId().allow(null).optional(),
-  body: Joi.string().min(1).max(5000).required()
+  body: Joi.string().min(1).max(5000).required(),
+});
+
+const commentUpdate = Joi.object({
+  body: Joi.string().min(1).max(5000).required(),
 });
 
 
@@ -260,7 +267,9 @@ const schemas = {
   questionCreate,
   questionUpdate,
   answerCreate,
+  answerUpdate,
   commentCreate,
+  commentUpdate,
   contactCreate,
   reportCreate,
   bookmarkToggle,

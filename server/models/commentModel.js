@@ -1,73 +1,76 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const CommentSchema = new Schema({
-  user: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-    required: [true, 'User is required'],
-    index: true
-  },
+const CommentSchema = new Schema(
+  {
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: [true, 'User is required'],
+      index: true,
+    },
 
-  article: {
-    type: Schema.Types.ObjectId,
-    ref: 'Article',
-    required: [true, 'Article is required'],
-    index: true
-  },
+    article: {
+      type: Schema.Types.ObjectId,
+      ref: 'Article',
+      required: [true, 'Article is required'],
+      index: true,
+    },
 
-  parent: {
-    type: Schema.Types.ObjectId,
-    ref: 'Comment',
-    default: null,
-    index: true
-  },
+    parent: {
+      type: Schema.Types.ObjectId,
+      ref: 'Comment',
+      default: null,
+      index: true,
+    },
 
-  body: {
-    type: String,
-    required: [true, 'Comment body is required'],
-    trim: true,
-    minlength: [1, 'Comment must not be empty'],
-    maxlength: [5000, 'Comment cannot exceed 5000 characters'],
-  },
+    body: {
+      type: String,
+      required: [true, 'Comment body is required'],
+      trim: true,
+      minlength: [1, 'Comment must not be empty'],
+      maxlength: [5000, 'Comment cannot exceed 5000 characters'],
+    },
 
-  deleted: {
-    type: Boolean,
-    default: false,
-    index: true,
-  },
-}, 
-{
-  timestamps: true,
-  versionKey: false,
-  toJSON: {
-    virtuals: true,
-    transform(doc, ret) {
-      ret.id = ret._id;
-      delete ret._id;
-      return ret;
+    deleted: {
+      type: Boolean,
+      default: false,
+      index: true,
     },
   },
-  toObject: {
-    virtuals: true,
-    transform(doc, ret) {
-      ret.id = ret._id;
-      delete ret._id;
-      return ret;
+  {
+    timestamps: true,
+    versionKey: false,
+    toJSON: {
+      virtuals: true,
+      transform(doc, ret) {
+        ret.id = ret._id;
+        delete ret._id;
+        return ret;
+      },
     },
-  },
-});
+    toObject: {
+      virtuals: true,
+      transform(doc, ret) {
+        ret.id = ret._id;
+        delete ret._id;
+        return ret;
+      },
+    },
+  }
+);
 
-CommentSchema.index({ itemType: 1, itemId: 1, createdAt: 1 });
-CommentSchema.index({ itemType: 1, itemId: 1, parent: 1, createdAt: 1 });
+
+CommentSchema.index({ article: 1, createdAt: 1 });
+CommentSchema.index({ article: 1, parent: 1, createdAt: 1 });
 CommentSchema.index({ user: 1, createdAt: -1 });
 
-// to check if this is a reply to another comment
+// Is this a reply?
 CommentSchema.virtual('isReply').get(function () {
   return !!this.parent;
 });
 
-// preview
+// Short preview
 CommentSchema.virtual('shortExcerpt').get(function () {
   if (!this.body) return '';
   const text = this.body.toString();
@@ -81,31 +84,33 @@ CommentSchema.methods.softDelete = async function () {
   return this;
 };
 
-// undo
 CommentSchema.methods.restore = async function () {
   this.deleted = false;
   await this.save();
   return this;
 };
 
-// to check which user the comment belongs to
+// Which user does this belong to?
 CommentSchema.methods.belongsTo = function (userId) {
   return this.user && this.user.toString() === userId.toString();
 };
 
-// all non-deleted comments for an item, oldest first
-CommentSchema.statics.findPublicForItem = function (
-  itemType,
-  itemId,
+// All non-deleted comments for an article, oldest first
+CommentSchema.statics.findPublicForArticle = function (
+  articleId,
   { page = 1, limit = 50 } = {}
 ) {
-  return this.find({ itemType, itemId, deleted: false })
+  return this.find({ article: articleId, deleted: false })
     .sort({ createdAt: 1 })
     .skip((page - 1) * limit)
     .limit(limit);
 };
 
-// replies to a specific comment
+CommentSchema.statics.countPublicForArticle = function (articleId) {
+  return this.countDocuments({ article: articleId, deleted: false });
+};
+
+// Replies to a specific comment
 CommentSchema.statics.findReplies = function (
   parentId,
   { page = 1, limit = 50 } = {}
@@ -122,6 +127,5 @@ CommentSchema.pre('save', function (next) {
   }
   next();
 });
-
 
 module.exports = mongoose.model('Comment', CommentSchema);
