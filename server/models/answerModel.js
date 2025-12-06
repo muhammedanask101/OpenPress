@@ -21,6 +21,11 @@ const AnswerSchema = new Schema({
     minlength: [1, 'Answer must not be empty'],
     maxlength: [10000, 'Answer cannot exceed 10000 characters'],
   },
+  views: {
+    type: Number,
+    default: 0,
+    min: 0,
+  },
   deleted: {
     type: Boolean,
     default: false,
@@ -64,6 +69,23 @@ AnswerSchema.methods.softDelete = async function () {
   await this.save();
   return this;
 };
+
+AnswerSchema.methods.incrementViews = async function () {
+  const updated = await this.constructor
+    .findByIdAndUpdate(
+      this._id,
+      { $inc: { views: 1 } },
+      { new: true }
+    )
+    .select('views');
+
+  if (updated) {
+    this.views = updated.views;
+  }
+
+  return this.views;
+};
+
 
 AnswerSchema.methods.updateBody = async function (newBody) {
   this.body = (newBody || '').toString();
