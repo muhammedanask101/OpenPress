@@ -96,24 +96,24 @@ const userSchema = new mongoose.Schema({
     }
 )
 
-UserSchema.index({ email: 1 }, { unique: true });
-UserSchema.index({ name: 1 }, { unique: true });
-UserSchema.index({ banned: 1 });
-UserSchema.index({ role: 1 });
+userSchema.index({ email: 1 }, { unique: true });
+userSchema.index({ name: 1 }, { unique: true });
+userSchema.index({ banned: 1 });
+userSchema.index({ role: 1 });
 
-UserSchema.virtual('displayName').get(function () {
-  return this.name || this.email.split('@')[0];
-});
+userSchema.statics.normalizeEmail = function (email) {
+  return email.toLowerCase().trim();
+};
 
-UserSchema.methods.comparePassword = async function (candidatePassword) {
+userSchema.methods.comparePassword = async function (candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };
 
-UserSchema.methods.isLocked = function () {
+userSchema.methods.isLocked = function () {
   return !!(this.lockUntil && this.lockUntil > Date.now());
 };
 
-UserSchema.methods.incFailedLogin = async function (maxAttempts = 5, lockMinutes = 10) {
+userSchema.methods.incFailedLogin = async function (maxAttempts = 5, lockMinutes = 10) {
   if (this.lockUntil && this.lockUntil < Date.now()) {
     this.failedLoginAttempts = 0;
     this.lockUntil = null;
@@ -129,27 +129,27 @@ UserSchema.methods.incFailedLogin = async function (maxAttempts = 5, lockMinutes
   return this;
 };
 
-UserSchema.methods.resetLoginAttempts = async function () {
+userSchema.methods.resetLoginAttempts = async function () {
   this.failedLoginAttempts = 0;
   this.lockUntil = null;
   await this.save();
   return this;
 };
 
-UserSchema.methods.softDelete = async function () {
+userSchema.methods.softDelete = async function () {
   this.banned = true;
   await this.save();
   return this;
 };
 
-UserSchema.statics.findActiveByEmail = function (email) {
+userSchema.statics.findActiveByEmail = function (email) {
   return this.findOne({
     email: email.toLowerCase().trim(),
     banned: false,
   }).select('+password +failedLoginAttempts +lockUntil');
 };
 
-UserSchema.statics.recordLoginSuccess = async function (userId, ip) {
+userSchema.statics.recordLoginSuccess = async function (userId, ip) {
   return this.findByIdAndUpdate(
     userId,
     { lastLoginAt: new Date(), lastLoginIp: ip },
@@ -158,8 +158,7 @@ UserSchema.statics.recordLoginSuccess = async function (userId, ip) {
 };
 
 
-// HASH PASSWORD BEFORE SAVING
-/* UserSchema.pre('save', async function (next) {
+userSchema.pre('save', async function (next) {
   try {
     if (!this.isModified('password')) return next();
 
@@ -170,9 +169,9 @@ UserSchema.statics.recordLoginSuccess = async function (userId, ip) {
   } catch (err) {
     next(err);
   }
-}); */
+});
 
-UserSchema.pre('save', function (next) {
+userSchema.pre('save', function (next) {
   if (this.name) {
     this.name = this.name.trim();
   }
