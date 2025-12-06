@@ -77,10 +77,21 @@ QuestionSchema.virtual('excerpt').get(function () {
 });
 
 QuestionSchema.methods.incrementViews = async function () {
-  this.views = (this.views || 0) + 1;
-  await this.save();
+  const updated = await this.constructor
+    .findByIdAndUpdate(
+      this._id,
+      { $inc: { views: 1 } },
+      { new: true }
+    )
+    .select('views');
+
+  if (updated) {
+    this.views = updated.views;
+  }
+
   return this.views;
 };
+
 
 QuestionSchema.methods.softDelete = async function () {
   this.deleted = true;
@@ -105,10 +116,10 @@ QuestionSchema.statics.searchPublic = function (query, options = {}) {
 
   return this.find(filter)
     .sort({ score: { $meta: 'textScore' }, createdAt: -1 })
-    .select({ score: { $meta: 'textScore' } })
     .skip((page - 1) * limit)
     .limit(limit);
 };
+
 
 QuestionSchema.pre('save', function (next) {
   if (Array.isArray(this.tags)) {

@@ -114,6 +114,22 @@ const questionCreate = Joi.object({
   tags: Joi.array().items(Joi.string().max(50)).max(10).default([])
 });
 
+const questionUpdate = Joi.object({
+  question: Joi.string()
+    .min(5)
+    .max(150)
+    .optional(),
+  context: Joi.string()
+    .max(5000)
+    .allow('', null)
+    .optional(),
+  tags: Joi.array()
+    .items(Joi.string().max(50))
+    .max(10)
+    .optional(),
+});
+
+
 const answerCreate = Joi.object({
   question: objectId().required(),
   body: Joi.string().min(1).max(10000).required()
@@ -242,6 +258,7 @@ const schemas = {
   articleCreate,
   articleUpdate,
   questionCreate,
+  questionUpdate,
   answerCreate,
   commentCreate,
   contactCreate,
@@ -257,5 +274,5 @@ const schemas = {
 module.exports = {
   sanitizeMiddleware,
   validateBody,
-  schemas
+  schemas,
 };

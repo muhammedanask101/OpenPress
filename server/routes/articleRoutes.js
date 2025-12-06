@@ -12,7 +12,7 @@ const {
   getMyArticles,
 } = require('../controllers/articleController');
 
-const { userprotect } = require('../middlewares/authMiddleware');
+const { userprotect, protect } = require('../middlewares/authMiddleware');
 const { sanitizeMiddleware, validateBody, schemas, } = require('../middlewares/sanitizeMiddleware');
 
 //public
@@ -32,10 +32,10 @@ router.get('/getarticles/:id', sanitizeMiddleware, getArticleById);
 router.post( '/postarticle', sanitizeMiddleware, userprotect, validateBody(schemas.articleCreate), postArticle );
 
 // Update article – only owner user can update (controller checks ownership)
-router.put( '/updatearticle/:id', sanitizeMiddleware, userprotect, validateBody(schemas.articleUpdate), updateArticle );
+router.put( '/updatearticle/:id', sanitizeMiddleware, protect, validateBody(schemas.articleUpdate), updateArticle );
 
 // Delete article (soft delete) – only owner user can delete
-router.delete( '/deletearticles/:id', sanitizeMiddleware, userprotect, deleteArticle );
+router.delete( '/deletearticles/:id', sanitizeMiddleware, protect, deleteArticle );
 
 // Get articles authored by current user
 router.get( '/getmyarticles', sanitizeMiddleware, userprotect, getMyArticles );
