@@ -186,16 +186,28 @@ const badgeCreate = Joi.object({
   iconUrl: Joi.string().uri().allow('', null),
   autoAward: Joi.object({
     enabled: Joi.boolean().default(false),
-    rule: Joi.any()
-  }).default({ enabled: false })
+    rule: Joi.any(),
+  }).default({ enabled: false }),
+});
+
+
+const badgeUpdate = Joi.object({
+  name: Joi.string().min(2).max(100).optional(),
+  description: Joi.string().max(500).allow('', null).optional(),
+  iconUrl: Joi.string().uri().allow('', null).optional(),
+  autoAward: Joi.object({
+    enabled: Joi.boolean().optional(),
+    rule: Joi.any().optional(),
+  }).optional(),
 });
 
 
 const badgeAward = Joi.object({
   user: objectId().required(),
   badge: objectId().required(),
-  reason: Joi.string().max(500).allow('', null)
+  reason: Joi.string().max(500).allow('', null),
 });
+
 
 
 const siteSettingsUpdate = Joi.object({
@@ -275,6 +287,7 @@ const schemas = {
   bookmarkToggle,
   starToggle,
   badgeCreate,
+  badgeUpdate,
   badgeAward,
   siteSettingsUpdate,
   mediaCreate 

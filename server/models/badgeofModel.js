@@ -1,91 +1,105 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const BadgeOfSchema = new Schema({
-  user: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-    required: true,
-    index: true
-  },
+const BadgeOfSchema = new Schema(
+  {
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+      index: true,
+    },
 
-  badge: {
-    type: Schema.Types.ObjectId,
-    ref: 'Badge',
-    required: true,
-    index: true
-  },
+    badge: {
+      type: Schema.Types.ObjectId,
+      ref: 'Badge',
+      required: true,
+      index: true,
+    },
 
-  awardedAt: {
-    type: Date,
-    default: Date.now,
-    index: true
-  },
+    awardedAt: {
+      type: Date,
+      default: Date.now,
+      index: true,
+    },
 
-  reason: {
-    type: String,
-    trim: true,
-    maxlength: 500,
-    default: '',
-  },
+    reason: {
+      type: String,
+      trim: true,
+      maxlength: 500,
+      default: '',
+    },
 
-  awardedBy: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-    default: null,
-    index: true,
+    awardedBy: {
+      type: Schema.Types.ObjectId,
+      ref: 'Admin',
+      default: null,
+      index: true,
+    },
+  },
+  {
+    timestamps: false,
+    versionKey: false,
+    toJSON: {
+      virtuals: true,
+      transform(doc, ret) {
+        ret.id = ret._id;
+        delete ret._id;
+        return ret;
+      },
+    },
+    toObject: {
+      virtuals: true,
+      transform(doc, ret) {
+        ret.id = ret._id;
+        delete ret._id;
+        return ret;
+      },
+    },
   }
-}, 
-{
-  timestamps: false,
-  versionKey: false,
-  toJSON: {
-    virtuals: true,
-    transform(doc, ret) {
-      ret.id = ret._id;
-      delete ret._id;
-      return ret;
-    },
-  },
-  toObject: {
-    virtuals: true,
-    transform(doc, ret) {
-      ret.id = ret._id;
-      delete ret._id;
-      return ret;
-    },
-  },
-});
+);
 
+// A user can only have a given badge once
 BadgeOfSchema.index({ user: 1, badge: 1 }, { unique: true });
 BadgeOfSchema.index({ user: 1, awardedAt: -1 });
-
 
 BadgeOfSchema.methods.revoke = async function () {
   await this.deleteOne();
   return true;
 };
 
-BadgeOfSchema.statics.awardbadge = async function ({
+// Robust award with upsert to avoid race-condition on unique index
+BadgeOfSchema.statics.awardBadge = async function ({
   userId,
   badgeId,
   reason = '',
   awardedBy = null,
 }) {
-  let doc = await this.findOne({ user: userId, badge: badgeId });
+  const filter = { user: userId, badge: badgeId };
 
-  if (!doc) {
-    doc = await this.create({
+  const update = {
+    $setOnInsert: {
       user: userId,
       badge: badgeId,
+      awardedAt: new Date(),
+    },
+    $set: {
       reason,
       awardedBy,
-      awardedAt: new Date(),
-    });
-  }
+    },
+  };
 
+  const options = {
+    new: true,
+    upsert: true,
+  };
+
+  const doc = await this.findOneAndUpdate(filter, update, options);
   return doc;
 };
+
+// Backwards compatibility: keep old name if used elsewhere
+BadgeOfSchema.statics.awardbadge = BadgeOfSchema.statics.awardBadge;
 
 // Get all badges for a user (populate Badge if you want)
 BadgeOfSchema.statics.getUserBadges = function (userId) {
@@ -97,12 +111,5 @@ BadgeOfSchema.statics.hasBadge = async function (userId, badgeId) {
   const doc = await this.findOne({ user: userId, badge: badgeId });
   return !!doc;
 };
-
-BadgeOfSchema.pre('save', function (next) {
-  if (typeof this.reason === 'string') {
-    this.reason = this.reason.trim();
-  }
-  next();
-});
 
 module.exports = mongoose.model('BadgeOf', BadgeOfSchema);

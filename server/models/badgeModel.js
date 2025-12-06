@@ -1,66 +1,69 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const BadgeSchema = new Schema({
-  name: {
-    type: String,
-    required: [true, 'Badge name is required'],
-    unique: true,
-    trim: true,
-    minlength: [2, 'Badge name must be at least 2 characters'],
-    maxlength: [100, 'Badge name cannot exceed 100 characters'],
-    index: true,
-  },
+const BadgeSchema = new Schema(
+  {
+    name: {
+      type: String,
+      required: [true, 'Badge name is required'],
+      unique: true,         
+      trim: true,
+      minlength: [2, 'Badge name must be at least 2 characters'],
+      maxlength: [100, 'Badge name cannot exceed 100 characters'],
+      index: true,
+    },
 
-  description: {
-    type: String,
-    trim: true,
-    maxlength: 500,
-    default: '',
-  },
+    description: {
+      type: String,
+      trim: true,
+      maxlength: 500,
+      default: '',
+    },
 
-  iconUrl: {
-    type: String,
-    trim: true,
-    maxlength: 500,
-    default: ''
-  },
+    iconUrl: {
+      type: String,
+      trim: true,
+      maxlength: 500,
+      default: '',
+    },
 
-  autoAward: {
-    enabled: { type: Boolean, default: false },
-    rule: {
-      type: Schema.Types.Mixed // e.g. { type: 'answers_count', threshold: 10 }
-    }
-  },
+    autoAward: {
+      enabled: { type: Boolean, default: false },
+      rule: {
+        type: Schema.Types.Mixed, // e.g. { type: 'answers_count', threshold: 10 }
+        default: null,
+      },
+    },
 
-  deleted: {
-    type: Boolean,
-    default: false,
-    index: true,
+    deleted: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
+  },
+  {
+    timestamps: true,
+    versionKey: false,
+    toJSON: {
+      virtuals: true,
+      transform(doc, ret) {
+        ret.id = ret._id;
+        delete ret._id;
+        return ret;
+      },
+    },
+    toObject: {
+      virtuals: true,
+      transform(doc, ret) {
+        ret.id = ret._id;
+        delete ret._id;
+        return ret;
+      },
+    },
   }
+);
 
-}, 
-{
-  timestamps: true,
-  versionKey: false,
-  toJSON: {
-    virtuals: true,
-    transform(doc, ret) {
-      ret.id = ret._id;
-      delete ret._id;
-      return ret;
-    },
-  },
-  toObject: {
-    virtuals: true,
-    transform(doc, ret) {
-      ret.id = ret._id;
-      delete ret._id;
-      return ret;
-    },
-  },
-});
-
+// This index helps queries on auto-award + soft delete
 BadgeSchema.index({ deleted: 1, 'autoAward.enabled': 1 });
 
 BadgeSchema.virtual('isActive').get(function () {
@@ -73,7 +76,6 @@ BadgeSchema.methods.softDelete = async function () {
   return this;
 };
 
-// Restore a deleted badge
 BadgeSchema.methods.restore = async function () {
   this.deleted = false;
   await this.save();
@@ -83,7 +85,7 @@ BadgeSchema.methods.restore = async function () {
 // Enable / configure auto-award rule
 BadgeSchema.methods.setAutoAward = async function (enabled, rule = null) {
   this.autoAward.enabled = !!enabled;
-  if (rule) {
+  if (rule !== undefined) {
     this.autoAward.rule = rule;
   }
   await this.save();
@@ -102,18 +104,5 @@ BadgeSchema.statics.findByName = function (name) {
     deleted: false,
   });
 };
-
-BadgeSchema.pre('save', function (next) {
-  if (typeof this.name === 'string') {
-    this.name = this.name.trim();
-  }
-  if (typeof this.description === 'string') {
-    this.description = this.description.trim();
-  }
-  if (typeof this.iconUrl === 'string') {
-    this.iconUrl = this.iconUrl.trim();
-  }
-  next();
-});
 
 module.exports = mongoose.model('Badge', BadgeSchema);
