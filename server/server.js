@@ -10,7 +10,9 @@ const morgan = require('morgan');
 const hpp = require('hpp');
 const { protect } = require('./middleware/authMiddleware');
 const maintenanceMode = require('./middleware/maintenanceMode');
+
 require('dotenv').config();
+
 const PORT = process.env.PORT || 5000;
 
 connectDB();
@@ -34,6 +36,16 @@ app.use('/api/articles', require('./routes/articleRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
 app.use('/api/contact', require('./routes/contactRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
+app.use('/api/questions', require('./routes/questionRoutes'));
+app.use('/api/answers', require('./routes/answerRoutes'));
+app.use('/api/comments', require('./routes/commentRoutes'));
+app.use('/api/reports', require('./routes/reportRoutes'));
+app.use('/api/badges', require('./routes/badgeRoutes'));
+app.use('/api/engagement', require('./routes/engagementRoutes'));
+app.use('/api/media', require('./routes/mediaRoutes'));
+app.use('/api/modlogs', require('./routes/modlogRoutes'));
+app.use('/api/sitesettings', require('./routes/sitesettingsRoutes'));
+
 app.use((req, res, next) => {
   res.status(404).json({ message: 'Route not found' });
 });
