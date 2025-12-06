@@ -34,6 +34,11 @@ const adminSchema = new mongoose.Schema(
             default: 0,
             select: false,
         },
+        lockUntil: {
+          type: Date,
+          default: null,
+          select: false,
+        },
         lastLoginAt: {
             type: Date,
         },
@@ -69,19 +74,46 @@ const adminSchema = new mongoose.Schema(
     }
 );
 
-AdminSchema.index({ email: 1 }, { unique: true });
-AdminSchema.index({ deleted: 1 });
-AdminSchema.index({ lockUntil: 1 });
+adminSchema.index({ email: 1 }, { unique: true });
+adminSchema.index({ deleted: 1 });
+adminSchema.index({ lockUntil: 1 });
 
-AdminSchema.statics.incrementFailedLoginAttempts = async function (adminId) {
-  return this.findByIdAndUpdate(
-    adminId,
-    { $inc: { failedLoginAttempts: 1 } },
-    { new: true }
-  );
+adminSchema.statics.normalizeEmail = function (email) {
+  return email.toLowerCase().trim();
 };
 
-AdminSchema.statics.recordLoginSuccess = async function (adminId, ip) {
+adminSchema.methods.isLocked = function () {
+  return !!(this.lockUntil && this.lockUntil > Date.now());
+};
+
+adminSchema.methods.incFailedLogin = async function (
+  maxAttempts = 5,
+  lockMinutes = 10
+) {
+  // If lock expired, reset counters
+  if (this.lockUntil && this.lockUntil < Date.now()) {
+    this.failedLoginAttempts = 0;
+    this.lockUntil = null;
+  }
+
+  this.failedLoginAttempts += 1;
+
+  if (this.failedLoginAttempts >= maxAttempts) {
+    this.lockUntil = new Date(Date.now() + lockMinutes * 60 * 1000);
+  }
+
+  await this.save();
+  return this;
+};
+
+adminSchema.methods.resetLoginAttempts = async function () {
+  this.failedLoginAttempts = 0;
+  this.lockUntil = null;
+  await this.save();
+  return this;
+};
+
+adminSchema.statics.recordLoginSuccess = async function (adminId, ip) {
   return this.findByIdAndUpdate(
     adminId,
     { lastLoginAt: new Date(), lastLoginIp: ip || undefined },
@@ -89,12 +121,20 @@ AdminSchema.statics.recordLoginSuccess = async function (adminId, ip) {
   );
 };
 
-AdminSchema.pre('save', async function (next) {
+adminSchema.statics.findActiveByEmail = function (email) {
+  const normalized = this.normalizeEmail(email);
+  return this.findOne({
+    email: normalized,
+    deleted: false,
+  }).select('+password +failedLoginAttempts +lockUntil');
+};
+
+adminSchema.pre('save', async function (next) {
   try {
     if (!this.isModified('password')) return next();
+
     const saltRounds = 10;
-    const hash = await bcrypt.hash(this.password, saltRounds);
-    this.password = hash;
+    this.password = await bcrypt.hash(this.password, saltRounds);
     next();
   } catch (err) {
     next(err);

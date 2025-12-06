@@ -1,5 +1,5 @@
 const asyncHandler = require('express-async-handler');
-const User = require('../models/userModel')
+const User = require('../models/usermodel')
 const jwt = require('jsonwebtoken');
 
 const generateJWTtoken = (id) => {
@@ -7,7 +7,7 @@ const generateJWTtoken = (id) => {
     throw new Error('JWT_SECRET is not defined');
   }
 
-  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '5d' });
+  return jwt.sign({ id, type: 'user' }, process.env.JWT_SECRET, { expiresIn: '5d' });
 };
 
 const registerUser = asyncHandler(async (req, res) => {

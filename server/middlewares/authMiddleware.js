@@ -1,6 +1,7 @@
-const jwt = require('jsonwebtoken')
-const asyncHandler = require('express-async-handler')
-const User = require('../models/adminModel')
+const jwt = require('jsonwebtoken');
+const asyncHandler = require('express-async-handler');
+const Admin = require('../models/adminModel');
+const User = require('../models/usermodel');
 
 const getBearerToken = (req) => {
   const auth = req.headers.authorization || '';
@@ -8,12 +9,22 @@ const getBearerToken = (req) => {
   return auth.split(' ')[1];
 };
 
-const verifyToken = (token) => {
-  if (!process.env.JWT_SECRET) {
-    throw new Error('JWT_SECRET is not defined');
+const verifyAdminToken = (token) => {
+  const secret = process.env.ADMIN_JWT_SECRET;
+  if (!secret) {
+    throw new Error('ADMIN_JWT_SECRET is not defined');
   }
-  return jwt.verify(token, process.env.JWT_SECRET);
+  return jwt.verify(token, secret);
 };
+
+const verifyUserToken = (token) => {
+  const secret = process.env.USER_JWT_SECRET;
+  if (!secret) {
+    throw new Error('USER_JWT_SECRET is not defined');
+  }
+  return jwt.verify(token, secret);
+};
+
 
 const protect = asyncHandler(async (req, res, next) => {
   const token = getBearerToken(req);
@@ -23,10 +34,15 @@ const protect = asyncHandler(async (req, res, next) => {
   }
 
   try {
-    const decoded = verifyToken(token);
+    const decoded = verifyAdminToken(token);
+
+    if (decoded.type !== 'admin') {
+      res.status(401);
+      throw new Error('Not authorized as admin');
+    }
 
     const admin = await Admin.findById(decoded.id).select('-password');
-    if (!admin) {
+    if (!admin || admin.deleted) {
       res.status(401);
       throw new Error('Admin not found');
     }
@@ -40,6 +56,7 @@ const protect = asyncHandler(async (req, res, next) => {
   }
 });
 
+
 const userprotect = asyncHandler(async (req, res, next) => {
   const token = getBearerToken(req);
   if (!token) {
@@ -48,7 +65,12 @@ const userprotect = asyncHandler(async (req, res, next) => {
   }
 
   try {
-    const decoded = verifyToken(token);
+    const decoded = verifyUserToken(token);
+
+    if (decoded.type !== 'user') {
+      res.status(401);
+      throw new Error('Not authorized as user');
+    }
 
     const user = await User.findById(decoded.id).select('-password');
     if (!user) {
@@ -70,5 +92,4 @@ const userprotect = asyncHandler(async (req, res, next) => {
   }
 });
 
-
-module.exports = { protect, userprotect }
+module.exports = { protect, userprotect };
