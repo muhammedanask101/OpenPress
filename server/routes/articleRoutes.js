@@ -1,11 +1,44 @@
+// routes/articleRoutes.js
 const express = require('express');
 const router = express.Router();
-const { getArticles, postArticle, updateArticle, deleteArticle } = require('../controllers/articleController');
-const { protect } = require('../middlewares/authMiddleware');
 
-router.get('/', getArticles);
-router.post('/', protect, postArticle);
-router.put('/:id', protect, updateArticle);
-router.delete('/:id', protect, deleteArticle);
+const {
+  getArticles,
+  getArticleById,
+  getArticleBySlug,
+  postArticle,
+  updateArticle,
+  deleteArticle,
+  getMyArticles,
+} = require('../controllers/articleController');
+
+const { userprotect } = require('../middlewares/authMiddleware');
+const { sanitizeMiddleware, validateBody, schemas, } = require('../middlewares/sanitizeMiddleware');
+
+//public
+
+// List articles (public, with optional search/filter)
+router.get('/getarticles', sanitizeMiddleware, getArticles);
+
+// Get article by slug (public, increments views)
+router.get('/getarticles/slug/:slug', sanitizeMiddleware, getArticleBySlug);
+
+// Get article by ID (public; non-approved restricted in controller)
+router.get('/getarticles/:id', sanitizeMiddleware, getArticleById);
+
+// users
+
+// Create article – only users can create (enforced in userprotect + controller)
+router.post( '/postarticle', sanitizeMiddleware, userprotect, validateBody(schemas.articleCreate), postArticle );
+
+// Update article – only owner user can update (controller checks ownership)
+router.put( '/updatearticle/:id', sanitizeMiddleware, userprotect, validateBody(schemas.articleUpdate), updateArticle );
+
+// Delete article (soft delete) – only owner user can delete
+router.delete( '/deletearticles/:id', sanitizeMiddleware, userprotect, deleteArticle );
+
+// Get articles authored by current user
+router.get( '/getmyarticles', sanitizeMiddleware, userprotect, getMyArticles );
 
 module.exports = router;
+

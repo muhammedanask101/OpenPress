@@ -89,7 +89,7 @@ const adminLogin = Joi.object({
 
 
 const articleCreate = Joi.object({
-  title: Joi.string().min(3).max(200).required(),
+  title: Joi.string().min(3).max(100).required(),
   body: Joi.string().min(20).max(20000).required(),
   preview: Joi.string().max(500).allow('', null),
   tags: Joi.array().items(Joi.string().max(50)).max(10).default([])
@@ -97,8 +97,8 @@ const articleCreate = Joi.object({
 
 
 const articleUpdate = Joi.object({
-  title: Joi.string().min(3).max(200).optional(),
-  body: Joi.string().min(20).max(20000).optional(),
+  title: Joi.string().min(3).max(100).optional(),
+  body: Joi.string().min(20).max(30000).optional(),
   preview: Joi.string().max(500).allow('', null).optional(),
   tags: Joi.array().items(Joi.string().max(50)).max(10).optional(),
   status: Joi.string().valid('pending', 'approved', 'rejected').optional()

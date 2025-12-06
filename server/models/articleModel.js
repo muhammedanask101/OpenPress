@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { Schema } = mongoose;
 
 function slugify(text) {
   return text
@@ -10,7 +11,7 @@ function slugify(text) {
     .replace(/^-+|-+$/g, '');
 }
 
-const articleSchema = mongoose.Schema(
+const articleSchema = new Schema(
 {   author: { 
         type: Schema.Types.ObjectId, 
         ref: 'User', 
@@ -28,6 +29,7 @@ const articleSchema = mongoose.Schema(
         type: String, 
         required: true, 
         index: true,
+        unique: true,
         trim: true,
     },
     body: { 
@@ -40,6 +42,7 @@ const articleSchema = mongoose.Schema(
         type: String,
         trim: true,
         maxlength: 500,
+    },
     tags: {
         type: [String],
         default: [],
@@ -49,7 +52,6 @@ const articleSchema = mongoose.Schema(
             },
                 message: 'You can specify at most 10 tags',
         },
-    },
     },
     status: { 
         type: String, 
@@ -94,11 +96,11 @@ const articleSchema = mongoose.Schema(
 } 
 );
 
-ArticleSchema.index({ status: 1, publishDate: -1 });
-ArticleSchema.index({ author: 1, createdAt: -1 });
-ArticleSchema.index({ title: 'text', body: 'text' });
+articleSchema.index({ status: 1, publishDate: -1 });
+articleSchema.index({ author: 1, createdAt: -1 });
+articleSchema.index({ title: 'text', body: 'text' });
 
-ArticleSchema.virtual('excerpt').get(function () {
+articleSchema.virtual('excerpt').get(function () {
   if (this.preview && this.preview.trim().length > 0) {
     return this.preview;
   }
@@ -108,23 +110,23 @@ ArticleSchema.virtual('excerpt').get(function () {
   return plain.slice(0, 200) + '...';
 });
 
-ArticleSchema.virtual('isPublished').get(function () {
+articleSchema.virtual('isPublished').get(function () {
   return this.status === 'approved' && !this.deleted;
 });
 
-ArticleSchema.methods.incrementViews = async function () {
-  this.views = (this.views || 0) + 1;
-  await this.save();
-  return this.views;
+articleSchema.methods.incrementViews = function () {
+  return this.constructor
+    .findByIdAndUpdate(this._id, { $inc: { views: 1 } }, { new: true })
+    .select('views');
 };
 
-ArticleSchema.methods.softDelete = async function () {
+articleSchema.methods.softDelete = async function () {
   this.deleted = true;
   await this.save();
   return this;
 };
 
-ArticleSchema.statics.findApproved = function (filter = {}, options = {}) {
+articleSchema.statics.findApproved = function (filter = {}, options = {}) {
   const { limit = 10, page = 1 } = options;
   return this.find({
     status: 'approved',
@@ -136,11 +138,11 @@ ArticleSchema.statics.findApproved = function (filter = {}, options = {}) {
     .limit(limit);
 };
 
-ArticleSchema.statics.findBySlug = function (slug) {
+articleSchema.statics.findBySlug = function (slug) {
   return this.findOne({ slug, deleted: false });
 };
 
-ArticleSchema.statics.searchPublic = function (query, options = {}) {
+articleSchema.statics.searchPublic = function (query, options = {}) {
   const { limit = 10, page = 1 } = options;
   const filter = {
     $text: { $search: query },
@@ -155,7 +157,7 @@ ArticleSchema.statics.searchPublic = function (query, options = {}) {
     .limit(limit);
 };
 
-ArticleSchema.pre('save', function (next) {
+articleSchema.pre('save', function (next) {
   if (this.isModified('title') || !this.slug) {
     this.slug = slugify(this.title || '');
   }
