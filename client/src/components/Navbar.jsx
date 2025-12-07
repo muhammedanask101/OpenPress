@@ -37,11 +37,11 @@ const Navbar = () => {
   return (
     <nav className="bg-white text-black p-3 md:p-6 border-b border-black md:border-b-2">
       <div className="flex justify-between items-center">
-        <div className="md:font-extrabold font-bold text-lg md:ml-4 md:text-2xl text-shadow-sm shadow-black tracking-wide">
+        <div className="md:font-extrabold font-bold text-lg md:ml-4 md:text-2xl tracking-wide">
           <Link to="/">Kerala Muslims</Link>
         </div>
 
-        <div className="hidden md:flex mr-4 text-2xl text-shadow-sm shadow-black font-bold space-x-4">
+        <div className="hidden md:flex mr-4 text-2xl font-bold space-x-4">
           { user && <Link to="/home" className="hover:text-blue-700">Home</Link> }
           { user && <Link to="/articles" className="hover:text-blue-700">Articles</Link> }
           { user && <Link to="/contact" className="hover:text-blue-700">Contact</Link> }
@@ -58,7 +58,7 @@ const Navbar = () => {
           ( <button onClick={handleUserLogout} className='hover:text-red-500 transition'>Logout</button> )}
         </div>
 
-        <div className="md:hidden text-md text-shadow-sm shadow-black mr-2">
+        <div className="md:hidden text-md mr-2">
           <div className='space-x-2'>
             <button onClick={() => setIsOpen(!isOpen)}>
               {isOpen && <X size={24} />}
