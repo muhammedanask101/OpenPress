@@ -99,8 +99,8 @@ const ReportSchema = new Schema(
   }
 );
 
-ReportSchema.index({ itemType: 1, itemId: 1, status: 1 });
-ReportSchema.index({ handledBy: 1, status: 1, createdAt: -1 });
+// ReportSchema.index({ itemType: 1, itemId: 1, status: 1 });
+// ReportSchema.index({ handledBy: 1, status: 1, createdAt: -1 });
 
 ReportSchema.virtual('isOpen').get(function () {
   return this.status === 'open' || this.status === 'reviewing';

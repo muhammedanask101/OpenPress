@@ -1,15 +1,14 @@
 const express = require('express');
-const cors = require('cors');
 const connectDB = require('./configs/db');
-const { sanitizeMiddleware } = require('./middleware/sanitizeMiddlware');
-const { apiLimiter } = require('./middleware/ratelimiterMiddleware');
-const errorMiddleware = require('./middleware/errorMiddleware');
+const { sanitizeMiddleware } = require('./middlewares/sanitizeMiddleware');
+const { apiLimiter } = require('./middlewares/ratelimiterMiddleware');
+const errorMiddleware = require('./middlewares/errorMiddleware');
 const helmet = require('helmet');
 const cors = require('cors');
 const morgan = require('morgan');
 const hpp = require('hpp');
-const { protect } = require('./middleware/authMiddleware');
-const maintenanceMode = require('./middleware/maintenanceMode');
+const { protect } = require('./middlewares/authMiddleware');
+// const maintenanceMode = require('./middlewares/maintenanceMiddleware');
 
 require('dotenv').config();
 
@@ -43,7 +42,7 @@ app.use('/api/reports', require('./routes/reportRoutes'));
 app.use('/api/badges', require('./routes/badgeRoutes'));
 app.use('/api/engagement', require('./routes/engagementRoutes'));
 app.use('/api/media', require('./routes/mediaRoutes'));
-app.use('/api/modlogs', require('./routes/modlogRoutes'));
+app.use('/api/modlogs', require('./routes/moderationRoutes'));
 app.use('/api/sitesettings', require('./routes/sitesettingsRoutes'));
 
 app.use((req, res, next) => {

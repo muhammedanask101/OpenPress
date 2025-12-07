@@ -147,10 +147,10 @@ const SiteSettingsSchema = new Schema(
 
 
 // If you ever have more than one, this helps find the active one
-SiteSettingsSchema.index({ deleted: 1, createdAt: -1 });
+// SiteSettingsSchema.index({ deleted: 1, createdAt: -1 });
 
 // For quickly checking maintenance mode
-SiteSettingsSchema.index({ 'maintenanceMode.enabled': 1 });
+// SiteSettingsSchema.index({ 'maintenanceMode.enabled': 1 });
 
 SiteSettingsSchema.virtual('isMaintenanceMode').get(function () {
   return !!(this.maintenanceMode && this.maintenanceMode.enabled);

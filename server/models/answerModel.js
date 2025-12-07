@@ -54,8 +54,8 @@ const AnswerSchema = new Schema({
 }
 );
 
-AnswerSchema.index({ question: 1, createdAt: 1 });
-AnswerSchema.index({ author: 1, createdAt: -1 });
+// AnswerSchema.index({ question: 1, createdAt: 1 });
+// AnswerSchema.index({ author: 1, createdAt: -1 });
 
 AnswerSchema.virtual('excerpt').get(function () {
   if (!this.body) return '';

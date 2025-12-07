@@ -61,9 +61,9 @@ const CommentSchema = new Schema(
 );
 
 
-CommentSchema.index({ article: 1, createdAt: 1 });
-CommentSchema.index({ article: 1, parent: 1, createdAt: 1 });
-CommentSchema.index({ user: 1, createdAt: -1 });
+// CommentSchema.index({ article: 1, createdAt: 1 });
+// CommentSchema.index({ article: 1, parent: 1, createdAt: 1 });
+// CommentSchema.index({ user: 1, createdAt: -1 });
 
 // Is this a reply?
 CommentSchema.virtual('isReply').get(function () {

@@ -60,8 +60,8 @@ const BadgeOfSchema = new Schema(
 );
 
 // A user can only have a given badge once
-BadgeOfSchema.index({ user: 1, badge: 1 }, { unique: true });
-BadgeOfSchema.index({ user: 1, awardedAt: -1 });
+// BadgeOfSchema.index({ user: 1, badge: 1 }, { unique: true });
+// BadgeOfSchema.index({ user: 1, awardedAt: -1 });
 
 BadgeOfSchema.methods.revoke = async function () {
   await this.deleteOne();

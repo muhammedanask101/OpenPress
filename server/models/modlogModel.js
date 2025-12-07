@@ -81,8 +81,8 @@ const ModLogSchema = new Schema({
   },
 });
 
-ModLogSchema.index({ itemType: 1, itemId: 1, createdAt: -1 });
-ModLogSchema.index({ actor: 1, createdAt: -1 });
+// ModLogSchema.index({ itemType: 1, itemId: 1, createdAt: -1 });
+// ModLogSchema.index({ actor: 1, createdAt: -1 });
 
 ModLogSchema.virtual('summary').get(function () {
   const who = this.actor ? `user:${this.actor}` : 'system';

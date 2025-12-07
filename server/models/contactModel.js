@@ -55,8 +55,8 @@ const contactSchema = new mongoose.Schema(
     }
 )
 
-contactSchema.index({ createdAt: -1 }); 
-contactSchema.index({ handled: 1, createdAt: -1 });
+// contactSchema.index({ createdAt: -1 }); 
+// contactSchema.index({ handled: 1, createdAt: -1 });
 
 // preview
 contactSchema.virtual('excerpt').get(function () {

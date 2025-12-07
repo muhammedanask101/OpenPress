@@ -54,8 +54,8 @@ const BookmarkSchema = new Schema(
   }
 );
 
-BookmarkSchema.index({ user: 1, itemType: 1, itemId: 1 }, { unique: true });
-BookmarkSchema.index({ user: 1, deleted: 1, createdAt: -1 });
+// BookmarkSchema.index({ user: 1, itemType: 1, itemId: 1 }, { unique: true });
+// BookmarkSchema.index({ user: 1, deleted: 1, createdAt: -1 });
 
 BookmarkSchema.methods.softDelete = async function () {
   this.deleted = true;

@@ -113,13 +113,13 @@ MediaSchema.index(
 );
 
 // list by uploader
-MediaSchema.index({ uploadedBy: 1, createdAt: -1 });
+// MediaSchema.index({ uploadedBy: 1, createdAt: -1 });
 
 // find media attached to a given item
-MediaSchema.index({ 'usedin.kind': 1, 'usedin.item': 1 });
+// MediaSchema.index({ 'usedin.kind': 1, 'usedin.item': 1 });
 
 // provider + region for infra queries
-MediaSchema.index({ storageProvider: 1, storageRegion: 1 });
+// MediaSchema.index({ storageProvider: 1, storageRegion: 1 });
 
 MediaSchema.virtual('isDeleted').get(function () {
   return !!this.deleted;

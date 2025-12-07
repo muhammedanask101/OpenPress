@@ -96,10 +96,10 @@ const userSchema = new mongoose.Schema({
     }
 )
 
-userSchema.index({ email: 1 }, { unique: true });
-userSchema.index({ name: 1 }, { unique: true });
-userSchema.index({ banned: 1 });
-userSchema.index({ role: 1 });
+// userSchema.index({ email: 1 }, { unique: true });
+// userSchema.index({ name: 1 }, { unique: true });
+// userSchema.index({ banned: 1 });
+// userSchema.index({ role: 1 });
 
 userSchema.statics.normalizeEmail = function (email) {
   return email.toLowerCase().trim();

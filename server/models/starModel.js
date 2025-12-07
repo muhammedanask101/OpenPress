@@ -58,9 +58,9 @@ const StarSchema = new Schema(
   }
 );
 
-StarSchema.index({ user: 1, itemType: 1, itemId: 1 }, { unique: true });
-StarSchema.index({ itemType: 1, itemId: 1, deleted: 1 });
-StarSchema.index({ user: 1, createdAt: -1 });
+// StarSchema.index({ user: 1, itemType: 1, itemId: 1 }, { unique: true });
+// StarSchema.index({ itemType: 1, itemId: 1, deleted: 1 });
+// StarSchema.index({ user: 1, createdAt: -1 });
 
 StarSchema.methods.softDelete = async function () {
   this.deleted = true;

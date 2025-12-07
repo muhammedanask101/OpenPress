@@ -63,8 +63,8 @@ const QuestionSchema = new Schema({
 }
 );
 
-QuestionSchema.index({ author: 1, createdAt: -1 });
-QuestionSchema.index({ question: 'text', context: 'text' });
+// QuestionSchema.index({ author: 1, createdAt: -1 });
+// QuestionSchema.index({ question: 'text', context: 'text' });
 
 QuestionSchema.virtual('excerpt').get(function () {
   const src = this.context && this.context.trim().length > 0

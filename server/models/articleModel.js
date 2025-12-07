@@ -96,9 +96,9 @@ const articleSchema = new Schema(
 } 
 );
 
-articleSchema.index({ status: 1, publishDate: -1 });
-articleSchema.index({ author: 1, createdAt: -1 });
-articleSchema.index({ title: 'text', body: 'text' });
+// articleSchema.index({ status: 1, publishDate: -1 });
+// articleSchema.index({ author: 1, createdAt: -1 });
+// articleSchema.index({ title: 'text', body: 'text' });
 
 articleSchema.virtual('excerpt').get(function () {
   if (this.preview && this.preview.trim().length > 0) {

@@ -64,7 +64,7 @@ const BadgeSchema = new Schema(
 );
 
 // This index helps queries on auto-award + soft delete
-BadgeSchema.index({ deleted: 1, 'autoAward.enabled': 1 });
+// BadgeSchema.index({ deleted: 1, 'autoAward.enabled': 1 });
 
 BadgeSchema.virtual('isActive').get(function () {
   return !this.deleted;

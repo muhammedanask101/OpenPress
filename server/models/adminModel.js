@@ -75,9 +75,9 @@ const adminSchema = new mongoose.Schema(
     }
 );
 
-adminSchema.index({ email: 1 }, { unique: true });
-adminSchema.index({ deleted: 1 });
-adminSchema.index({ lockUntil: 1 });
+// adminSchema.index({ email: 1 }, { unique: true });
+// adminSchema.index({ deleted: 1 });
+// adminSchema.index({ lockUntil: 1 });
 
 adminSchema.statics.normalizeEmail = function (email) {
   return email.toLowerCase().trim();
