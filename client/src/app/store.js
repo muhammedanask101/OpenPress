@@ -6,11 +6,11 @@ import userReducer from '../slices/userSlice';
 
 const store = configureStore({
   reducer: {
-      articles: articleReducer,
-      admin: adminReducer,
-      contacts: contactReducer,
-      users: userReducer,
-  }
+    articles: articleReducer,
+    admin: adminReducer,
+    contacts: contactReducer,
+    user: userReducer,
+  },
 });
 
 export default store;

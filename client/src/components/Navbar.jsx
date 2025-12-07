@@ -3,31 +3,31 @@ import { useState } from 'react';
 import { Menu, X } from "lucide-react";
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { logout, reset } from '../slices/adminSlice';
-import { userLogout } from '../slices/userSlice';
+import { logoutAdmin, reset } from '../slices/adminSlice';
+import { logoutUser } from '../slices/userSlice';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const { admin } = useSelector(state => state.auth);
-  const { user } = useSelector(state => state.users);
+  const { admin } = useSelector(state => state.admin);
+  const { user } = useSelector(state => state.user);
 
   const handleLogout = () => {
-    dispatch(logout());
+    dispatch(logoutAdmin());
     dispatch(reset());
-    dispatch(userLogout());
+    dispatch(logoutUser());
     dispatch(reset());
     setIsOpen(false);
     navigate("/adminlogin");
   };
 
   const handleUserLogout = () => {
-    dispatch(userLogout());
+    dispatch(logoutUser());
     dispatch(reset());
     if(admin){
-      dispatch(logout());
+      dispatch(logoutAdmin());
       dispatch(reset());
     }
     setIsOpen(false);

@@ -6,7 +6,7 @@ import { useEffect } from "react";
 
 export default function Admin() {
     const navigate = useNavigate();
-    const { admin } = useSelector(state => state.auth);
+    const { admin } = useSelector(state => state.admin);
 
     useEffect(() => {
         if (!admin) navigate('/adminlogin')

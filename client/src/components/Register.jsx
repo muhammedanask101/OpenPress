@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import { useSelector, useDispatch } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import { register, reset } from '../slices/userSlice'
+import { registerUser, reset } from '../slices/userSlice'
 import 'react-toastify/dist/ReactToastify.css'
 import FallbackLoading from "./FallbackLoading"
 
@@ -13,7 +13,7 @@ const UserRegister = () => {
     const navigate = useNavigate()
     const dispatch = useDispatch()
 
-    const { user, isLoading, isError, isSuccess, message } = useSelector(state => state.users)
+    const { user, isLoading, isError, isSuccess, message } = useSelector(state => state.user)
 
     useEffect(() => {
         if (isError) toast.error(message)
@@ -35,7 +35,7 @@ const UserRegister = () => {
             toast.error('Passwwords dont match')
         } else {
             const userData = { name, email, password }
-            dispatch(register(userData))
+            dispatch(registerUser(userData))
         }
     }
 

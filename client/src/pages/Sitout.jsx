@@ -5,7 +5,7 @@ import { useEffect } from "react";
 const Home = () => {
 
     const navigate = useNavigate();
-    const { user } = useSelector(state => state.users);
+    const { user } = useSelector(state => state.user);
 
     useEffect(() => {
         if (user) navigate('/home')

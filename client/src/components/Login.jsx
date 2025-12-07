@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import { useSelector, useDispatch } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import { userLogin, reset } from '../slices/userSlice'
+import { loginUser, reset } from '../slices/userSlice'
 import FallbackLoading from "./FallbackLoading"
 
 const UserLogIn = () => {
@@ -10,7 +10,7 @@ const UserLogIn = () => {
     const { email, password } = formData
     const navigate = useNavigate()
     const dispatch = useDispatch()
-    const { user, isLoading, isError, isSuccess, message } = useSelector(state => state.users)
+    const { user, isLoading, isError, isSuccess, message } = useSelector(state => state.user)
 
     useEffect(() => {
         if (isError) toast.error(message)
@@ -28,7 +28,7 @@ const UserLogIn = () => {
     const onSubmit = (e) => {
         e.preventDefault();
         const userData = { email, password }
-        dispatch(userLogin(userData)).unwrap().then(
+        dispatch(loginUser(userData)).unwrap().then(
             () => {
                 navigate("/");
             }

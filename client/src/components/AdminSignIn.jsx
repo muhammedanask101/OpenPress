@@ -2,16 +2,16 @@ import { useState, useEffect } from "react"
 import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import { login, reset } from '../slices/authSlice'
-import { userLogin } from '../slices/userSlice'
+import { loginUser } from '../slices/userSlice'
 import FallbackLoading from "./FallbackLoading"
+import { loginAdmin, reset } from "../slices/adminSlice"
 
 const AdminSignIn = () => {
     const [formData, setFormData] = useState({ email: '', password: ''})
     const { email, password } = formData
     const navigate = useNavigate()
     const dispatch = useDispatch()
-    const { admin, isLoading, isError, isSuccess, message } = useSelector(state => state.auth)
+    const { admin, isLoading, isError, isSuccess, message } = useSelector(state => state.admin)
 
     useEffect(() => {
         if (isError) toast.error(message)
@@ -29,14 +29,14 @@ const AdminSignIn = () => {
     const onSubmit = (e) => {
         e.preventDefault();
         const adminData = { email, password }
-        dispatch(login(adminData)).unwrap().then(
+        dispatch(loginAdmin(adminData)).unwrap().then(
             () => {
                 navigate("/admin");
             }
         ).catch(err => {
             console.error(err);
         })
-        dispatch(userLogin(adminData)).unwrap().catch(err => {
+        dispatch(loginUser(adminData)).unwrap().catch(err => {
             console.error(err);
         })
 }
