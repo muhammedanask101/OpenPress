@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Menu, X } from "lucide-react";
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { logout, reset } from '../slices/authSlice';
+import { logout, reset } from '../slices/adminSlice';
 import { userLogout } from '../slices/userSlice';
 
 const Navbar = () => {

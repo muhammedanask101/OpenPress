@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, isPending, isRejected } from "@reduxjs/toolkit";
-import articleService from "../services/ArticleService";
+import articleService from "../services/articleService";
 
 const initialState = {
     articles: [],

@@ -82,9 +82,9 @@ const getCurrentUser = asyncHandler(async (req, res) => {
     }
 
     res.status(200).json({
-        id: user._id,
-        name: user.name,
-        email: user.email,
+        id: req.user._id,
+        name: req.user.name,
+        email: req.user.email,
     });
 })
 
