@@ -1,6 +1,7 @@
-const mongoSanitize = require('express-mongo-sanitize');
 const sanitizeHtml = require('sanitize-html');
 const Joi = require('joi');
+// keep the package require in case you want it elsewhere, but we won't call its middleware
+// const mongoSanitize = require('express-mongo-sanitize');
 
 function deepSanitize(input) {
   if (typeof input === 'string') {
@@ -26,15 +27,64 @@ function deepSanitize(input) {
   return input;
 }
 
+// Remove keys starting with $ or containing '.' (recursively).
+function stripMongoKeys(input) {
+  if (!input || typeof input !== 'object') return input;
+  if (Array.isArray(input)) return input.map(stripMongoKeys);
+
+  const out = {};
+  for (const [k, v] of Object.entries(input)) {
+    if (typeof k === 'string' && (k.startsWith('$') || k.includes('.'))) {
+      // Option: rename instead of drop:
+      // const safeKey = k.replace(/^\$+/, '').replace(/\./g, '_');
+      // out[safeKey] = stripMongoKeys(v);
+      // For security, DROP the dangerous keys:
+      continue;
+    }
+    out[k] = stripMongoKeys(v);
+  }
+  return out;
+}
 
 function sanitizeMiddleware(req, res, next) {
-  mongoSanitize({ replaceWith: '_' })(req, res, () => {
-    if (req.body) req.body = deepSanitize(req.body);
-    if (req.query) req.query = deepSanitize(req.query);
-    if (req.params) req.params = deepSanitize(req.params);
+  try {
+    // BODY: sanitize strings and strip mongo keys, then replace in-place (body is normally writable)
+    if (req.body) {
+      const cleanedBody = deepSanitize(req.body);
+      req.body = stripMongoKeys(cleanedBody);
+    }
+
+    // PARAMS: sanitize and strip keys (params is normally writable)
+    if (req.params) {
+      const cleanedParams = deepSanitize(req.params);
+      req.params = stripMongoKeys(cleanedParams);
+    }
+
+    // QUERY: sanitize and strip keys, but DO NOT overwrite req.query (it may be getter-only).
+    // Store the safe copy on req.sanitizedQuery so handlers can use it.
+    const rawQuery = req.query || {};
+    const cleanedQuery = stripMongoKeys(deepSanitize(rawQuery));
+
+    try {
+      // attempt to write back to req.query if runtime allows (non-fatal)
+      req.query = cleanedQuery;
+      req.sanitizedQuery = req.query;
+    } catch (err) {
+      // runtime made req.query read-only (the cause of your original error).
+      // Use fallback property and warn once.
+      req.sanitizedQuery = cleanedQuery;
+      // console.warn kept minimal so it doesn't spam logs
+      console.warn('sanitizeMiddleware: req.query appears read-only; using req.sanitizedQuery fallback.');
+    }
+
     next();
-  });
+  } catch (err) {
+    // don't crash the request pipeline because sanitization failed; log and continue
+    console.error('sanitizeMiddleware error:', err && err.stack ? err.stack : err);
+    next();
+  }
 }
+
 
 
 function validateBody(schema) {
@@ -63,30 +113,26 @@ const objectId = () => Joi.string().length(24).hex();
 const userRegister = Joi.object({
   name: Joi.string().min(2).max(50).required(),
   email: Joi.string().email().lowercase().required(),
-  password: Joi.string().min(8).max(128).required(),
+  password: Joi.string().min(8).max(1000).required(),
   bio: Joi.string().max(500).allow('', null),
   avatarlink: Joi.string().uri().allow('', null)
 });
 
-
 const userLogin = Joi.object({
   email: Joi.string().email().lowercase().required(),
-  password: Joi.string().min(8).max(128).required()
+  password: Joi.string().min(8).max(1000).required()
 });
-
 
 const adminRegister = Joi.object({
   name: Joi.string().min(2).max(50).required(),
   email: Joi.string().email().lowercase().required(),
-  password: Joi.string().min(8).max(128).required()
+  password: Joi.string().min(8).max(1000).required()
 });
-
 
 const adminLogin = Joi.object({
   email: Joi.string().email().lowercase().required(),
-  password: Joi.string().min(8).max(128).required()
+  password: Joi.string().min(8).max(1000).required()
 });
-
 
 const articleCreate = Joi.object({
   title: Joi.string().min(3).max(100).required(),
@@ -95,7 +141,6 @@ const articleCreate = Joi.object({
   tags: Joi.array().items(Joi.string().max(50)).max(10).default([])
 });
 
-
 const articleUpdate = Joi.object({
   title: Joi.string().min(3).max(100).optional(),
   body: Joi.string().min(20).max(30000).optional(),
@@ -103,7 +148,6 @@ const articleUpdate = Joi.object({
   tags: Joi.array().items(Joi.string().max(50)).max(10).optional(),
   status: Joi.string().valid('pending', 'approved', 'rejected').optional()
 });
-
 
 const questionCreate = Joi.object({
   question: Joi.string()
@@ -129,7 +173,6 @@ const questionUpdate = Joi.object({
     .optional(),
 });
 
-
 const answerCreate = Joi.object({
   question: objectId().required(),
   body: Joi.string().min(1).max(10000).required()
@@ -138,7 +181,6 @@ const answerCreate = Joi.object({
 const answerUpdate = Joi.object({
   body: Joi.string().min(1).max(10000).required()
 });
-
 
 const commentCreate = Joi.object({
   article: objectId().required(),
@@ -150,13 +192,11 @@ const commentUpdate = Joi.object({
   body: Joi.string().min(1).max(5000).required(),
 });
 
-
 const contactCreate = Joi.object({
   name: Joi.string().min(2).max(100).required(),
   email: Joi.string().email().lowercase().required(),
   message: Joi.string().min(5).max(5000).required()
 });
-
 
 const reportCreate = Joi.object({
   itemType: Joi.string()
@@ -167,18 +207,15 @@ const reportCreate = Joi.object({
   details: Joi.string().max(5000).allow('', null)
 });
 
-
 const bookmarkToggle = Joi.object({
   itemType: Joi.string().valid('article', 'question', 'answer').required(),
   itemId: objectId().required()
 });
 
-
 const starToggle = Joi.object({
   itemType: Joi.string().valid('article', 'answer').required(),
   itemId: objectId().required()
 });
-
 
 const badgeCreate = Joi.object({
   name: Joi.string().min(2).max(100).required(),
@@ -190,7 +227,6 @@ const badgeCreate = Joi.object({
   }).default({ enabled: false }),
 });
 
-
 const badgeUpdate = Joi.object({
   name: Joi.string().min(2).max(100).optional(),
   description: Joi.string().max(500).allow('', null).optional(),
@@ -201,14 +237,11 @@ const badgeUpdate = Joi.object({
   }).optional(),
 });
 
-
 const badgeAward = Joi.object({
   user: objectId().required(),
   badge: objectId().required(),
   reason: Joi.string().max(500).allow('', null),
 });
-
-
 
 const siteSettingsUpdate = Joi.object({
   siteName: Joi.string().max(200).optional(),

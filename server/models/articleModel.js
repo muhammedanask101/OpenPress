@@ -1,80 +1,81 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
+const slugify = require('slugify'); // keep only this import (no local function with same name)
 
-function slugify(text) {
-  return text
-    .toString()
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w\s-]/g, '')  
-    .replace(/[\s_-]+/g, '-') 
-    .replace(/^-+|-+$/g, '');
+// helper to create a safe slug base
+function makeSlugBase(text = '') {
+  return slugify(String(text), {
+    lower: true,
+    strict: true, // remove special characters
+    remove: /[*+~.()'"!:@]/g
+  }).slice(0, 80);
 }
 
 const articleSchema = new Schema(
-{   author: { 
-        type: Schema.Types.ObjectId, 
-        ref: 'User', 
-        required: true, 
-        index: true 
+  {
+    author: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+      index: true
     },
     title: {
-        type: String,
-        required: [true, 'Please add a title'],
-        trim: true,
-        minlength: [3, 'Title must be at least 3 characters'],
-        maxlength: [100, 'Title cannot exceed 100 characters'],
+      type: String,
+      required: [true, 'Please add a title'],
+      trim: true,
+      minlength: [3, 'Title must be at least 3 characters'],
+      maxlength: [100, 'Title cannot exceed 100 characters'],
     },
-    slug: { 
-        type: String, 
-        required: true, 
-        index: true,
-        unique: true,
-        trim: true,
+    slug: {
+      type: String,
+      required: true,
+      index: true,
+      unique: true,
+      trim: true,
     },
-    body: { 
-        type: String, 
-        required: true,
-        minlength: [20, 'Body must be at least 20 characters'],
-        maxlength: [30000, 'Body cannot exceed 30000 characters'], 
+    body: {
+      type: String,
+      required: true,
+      minlength: [20, 'Body must be at least 20 characters'],
+      maxlength: [30000, 'Body cannot exceed 30000 characters'],
     },
-    preview: { 
-        type: String,
-        trim: true,
-        maxlength: 500,
+    preview: {
+      type: String,
+      trim: true,
+      maxlength: 500,
     },
     tags: {
-        type: [String],
-        default: [],
-        validate: {
-            validator: function (arr) {
-                return Array.isArray(arr) && arr.length <= 10;
-            },
-                message: 'You can specify at most 10 tags',
+      type: [String],
+      default: [],
+      validate: {
+        validator: function (arr) {
+          return Array.isArray(arr) && arr.length <= 10;
         },
+        message: 'You can specify at most 10 tags',
+      },
     },
-    status: { 
-        type: String, 
-        enum: ['pending','approved','rejected'], 
-        default: 'pending', 
-        index: true,
+    status: {
+      type: String,
+      enum: ['pending', 'approved', 'rejected'],
+      default: 'pending',
+      index: true,
     },
     publishDate: {
-        type: Date,
-        index: true,
+      type: Date,
+      index: true,
     },
-    views: { 
-        type: Number, 
-        default: 0,
-        min: 0,
+    views: {
+      type: Number,
+      default: 0,
+      min: 0,
     },
-    deleted: { 
-        type: Boolean, 
-        default: false,
-        index: true,
+    deleted: {
+      type: Boolean,
+      default: false,
+      index: true,
     }
-},
-{
+  },
+  {
     timestamps: true,
     versionKey: false,
     toJSON: {
@@ -93,13 +94,10 @@ const articleSchema = new Schema(
         return ret;
       },
     },
-} 
+  }
 );
 
-// articleSchema.index({ status: 1, publishDate: -1 });
-// articleSchema.index({ author: 1, createdAt: -1 });
-// articleSchema.index({ title: 'text', body: 'text' });
-
+// virtuals
 articleSchema.virtual('excerpt').get(function () {
   if (this.preview && this.preview.trim().length > 0) {
     return this.preview;
@@ -114,6 +112,7 @@ articleSchema.virtual('isPublished').get(function () {
   return this.status === 'approved' && !this.deleted;
 });
 
+// instance methods
 articleSchema.methods.incrementViews = function () {
   return this.constructor
     .findByIdAndUpdate(this._id, { $inc: { views: 1 } }, { new: true })
@@ -126,6 +125,7 @@ articleSchema.methods.softDelete = async function () {
   return this;
 };
 
+// statics
 articleSchema.statics.findApproved = function (filter = {}, options = {}) {
   const { limit = 10, page = 1 } = options;
   return this.find({
@@ -150,28 +150,49 @@ articleSchema.statics.searchPublic = function (query, options = {}) {
     deleted: false,
   };
 
-    return this.find(filter)
+  return this.find(filter)
     .sort({ score: { $meta: 'textScore' } })
     .select({ score: { $meta: 'textScore' } })
     .skip((page - 1) * limit)
     .limit(limit);
 };
 
-articleSchema.pre('save', function (next) {
-  if (this.isModified('title') || !this.slug) {
-    this.slug = slugify(this.title || '');
-  }
+// Pre-validate hook: generate unique slug when creating or title changes.
+// Use pre('validate') so slug exists for schema validation.
+articleSchema.pre('validate', async function (next) {
+  try {
+    // generate slug if missing or title changed
+    if ((this.isNew || this.isModified('title')) && !this.slug) {
+      const base = makeSlugBase(this.title) || Date.now().toString();
+      let candidate = base;
+      let counter = 0;
 
-  if (
-    this.isModified('status') &&
-    this.status === 'approved' &&
-    !this.publishDate
-  ) {
-    this.publishDate = new Date();
-  }
+      // build filter to exclude current doc _id when checking (useful on updates)
+      const existsFilter = (slug) => {
+        const q = { slug };
+        if (this._id) q._id = { $ne: this._id };
+        return q;
+      };
 
-  next();
+      // check for collisions and append suffix if needed
+      // loop is acceptable for small number of collisions
+      while (await mongoose.models.Article.exists(existsFilter(candidate))) {
+        counter += 1;
+        candidate = `${base}-${counter}`;
+      }
+
+      this.slug = candidate;
+    }
+
+    // preserve your publishDate logic
+    if (this.isModified('status') && this.status === 'approved' && !this.publishDate) {
+      this.publishDate = new Date();
+    }
+
+    next();
+  } catch (err) {
+    next(err);
+  }
 });
-
 
 module.exports = mongoose.model('Article', articleSchema);

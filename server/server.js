@@ -29,7 +29,6 @@ app.use(express.json({ limit: '1mb' }));
 app.use(hpp());
 app.use(sanitizeMiddleware);
 app.use('/api', apiLimiter);
-app.use(protect);
 // app.use maintenance middleware
 app.use('/api/articles', require('./routes/articleRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));

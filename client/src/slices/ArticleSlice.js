@@ -21,8 +21,8 @@ const initialState = {
 
 // Public/Shared: list articles with filters/search/pagination
 // params = { page, limit, q, tag, author }
-export const fetchArticles = createAsyncThunk(
-  'articles/fetchAll',
+export const getArticles = createAsyncThunk(
+  'articles/getAll',
   async (params = {}, thunkAPI) => {
     try {
       return await articleService.getArticles(params);
@@ -39,8 +39,8 @@ export const fetchArticles = createAsyncThunk(
 );
 
 // Public: get article by id (controller enforces visibility)
-export const fetchArticleById = createAsyncThunk(
-  'articles/fetchById',
+export const getArticleById = createAsyncThunk(
+  'articles/getById',
   async (id, thunkAPI) => {
     try {
       return await articleService.getArticleById(id);
@@ -57,8 +57,8 @@ export const fetchArticleById = createAsyncThunk(
 );
 
 // Public: get article by slug (increments views)
-export const fetchArticleBySlug = createAsyncThunk(
-  'articles/fetchBySlug',
+export const getArticleBySlug = createAsyncThunk(
+  'articles/getBySlug',
   async (slug, thunkAPI) => {
     try {
       return await articleService.getArticleBySlug(slug);
@@ -129,8 +129,8 @@ export const deleteArticle = createAsyncThunk(
 );
 
 // User: get own authored articles
-export const fetchMyArticles = createAsyncThunk(
-  'articles/fetchMine',
+export const getMyArticles = createAsyncThunk(
+  'articles/getMine',
   async (params = {}, thunkAPI) => {
     try {
       return await articleService.getMyArticles(params);
@@ -165,7 +165,7 @@ export const articleSlice = createSlice({
   extraReducers: (builder) => {
     builder
       // list (public/admin)
-      .addCase(fetchArticles.fulfilled, (state, action) => {
+      .addCase(getArticles.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
         state.articles = action.payload.data || [];
@@ -173,14 +173,14 @@ export const articleSlice = createSlice({
       })
 
       // get by id
-      .addCase(fetchArticleById.fulfilled, (state, action) => {
+      .addCase(getArticleById.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
         state.currentArticle = action.payload;
       })
 
       // get by slug
-      .addCase(fetchArticleBySlug.fulfilled, (state, action) => {
+      .addCase(getArticleBySlug.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
         state.currentArticle = action.payload;
@@ -247,7 +247,7 @@ export const articleSlice = createSlice({
       })
 
       // my articles
-      .addCase(fetchMyArticles.fulfilled, (state, action) => {
+      .addCase(getMyArticles.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
         state.myArticles = action.payload.data || [];
@@ -257,13 +257,13 @@ export const articleSlice = createSlice({
       // common pending
       .addMatcher(
         isPending(
-          fetchArticles,
-          fetchArticleById,
-          fetchArticleBySlug,
+          getArticles,
+          getArticleById,
+          getArticleBySlug,
           createArticle,
           updateArticle,
           deleteArticle,
-          fetchMyArticles
+          getMyArticles
         ),
         (state) => {
           state.isLoading = true;
@@ -275,13 +275,13 @@ export const articleSlice = createSlice({
       // common rejected
       .addMatcher(
         isRejected(
-          fetchArticles,
-          fetchArticleById,
-          fetchArticleBySlug,
+          getArticles,
+          getArticleById,
+          getArticleBySlug,
           createArticle,
           updateArticle,
           deleteArticle,
-          fetchMyArticles
+          getMyArticles
         ),
         (state, action) => {
           state.isLoading = false;

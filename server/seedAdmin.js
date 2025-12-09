@@ -1,6 +1,6 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
-const Admin = require('../models/adminModel');
+const Admin = require('./models/adminModel');
 
 const MONGO_URI = process.env.MONGO_URI;
 

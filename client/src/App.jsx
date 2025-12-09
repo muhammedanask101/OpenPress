@@ -11,6 +11,7 @@ const Register = lazy(() => import('./pages/Register'));
 const Admin = lazy(() => import('./pages/Admin'));
 const EditArticle = lazy(() => import('./pages/EditArticle'));
 const Sitout = lazy(() => import('./pages/Sitout'));
+const PostArticle = lazy(() => import('./pages/PostArticle'));
 import './index.css'
 import FallbackLoading from './components/FallbackLoading';
 
@@ -31,6 +32,7 @@ function App() {
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/adminlogin" element={<AdminLogin />} />
                 <Route path="/admin" element={<Admin />} />
+                <Route path="/postarticle" element={<PostArticle />} />
                 <Route path="/user/articles/:id/edit" element={<EditArticle />} />
               </Routes>
             </Suspense>

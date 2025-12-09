@@ -24,7 +24,7 @@ const ArticleArray = () => {
                 <section className="grid grid-cols-1 justify-items-center md:grid-cols-2 xl:grid-cols-4 gap-8 p-4">
                     {Array.isArray(articles) && articles.length > 0 ? 
                     (articles.map(article => <Article key={article._id} article={article} />)) : (
-                        <p>No articles to display yet.</p>
+                        <p className="text-red-600">No articles to display yet.</p>
                     )}
                 </section>
             </>
