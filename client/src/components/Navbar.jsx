@@ -85,7 +85,7 @@ const Navbar = () => {
           {admin && location.pathname.startsWith("/admin") && 
             ( <button onClick={handleLogout} className='text-left hover:text-red-500 transition'>Logout</button> )}
           {user && !(location.pathname.startsWith("/admin")) &&
-            ( <button onClick={handleUserLogout} className='hover:text-red-500 transition'>Logout</button> )}
+            ( <button onClick={handleUserLogout} className='text-left hover:text-red-500 transition'>Logout</button> )}
         </div>
       )}
     </nav>

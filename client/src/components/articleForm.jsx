@@ -130,13 +130,13 @@ const ArticleForm = () => {
             <div className="flex flex-wrap gap-2 mt-2">
               {tags.length === 0 && <div className="text-[12px] md:text-sm text-gray-300">No tags yet</div>}
               {tags.map(t => (
-                <div key={t} className="flex items-center bg-gray-200 text-sm rounded-full px-3 py-1">
+                <div key={t} className="flex items-center bg-yellow-500 text-sm rounded-full px-3 py-1">
                   <span>{t}</span>
                   <button
                     type="button"
                     onClick={() => removeTag(t)}
                     aria-label={`Remove ${t}`}
-                    className="ml-2 text-xs text-red-600"
+                    className="ml-2 text-xs text-black"
                   >
                     ×
                   </button>

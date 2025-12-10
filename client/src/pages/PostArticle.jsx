@@ -14,7 +14,7 @@ const PostArticle = () => {
 
     return (
         <>
-            <div className="text-blue-700 text-wrap font-bold text-lg text-center md:text-3xl">Post an Article</div>
+            <div className="text-blue-950 text-wrap font-bold text-lg text-center md:text-3xl">Post an Article</div>
             <ArticleForm />
         </>
     )

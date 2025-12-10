@@ -1,14 +1,39 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
-const slugify = require('slugify'); // keep only this import (no local function with same name)
+const slugify = require('slugify');
 
-// helper to create a safe slug base
 function makeSlugBase(text = '') {
   return slugify(String(text), {
     lower: true,
-    strict: true, // remove special characters
+    strict: true,
     remove: /[*+~.()'"!:@]/g
   }).slice(0, 80);
+}
+
+// strip HTML tags and collapse whitespace
+function stripHtml(input = '') {
+  if (!input) return '';
+  // remove tags
+  let s = String(input).replace(/<[^>]*>/g, ' ');
+  // decode common HTML entities minimally (optional)
+  s = s.replace(/&nbsp;/gi, ' ');
+  // collapse whitespace
+  s = s.replace(/\s+/g, ' ').trim();
+  return s;
+}
+
+// create a preview: use first paragraph or first N chars (preserve word boundary)
+function makePreviewFromBody(body, maxLen = 200) {
+  const text = stripHtml(body);
+  if (!text) return '';
+  // split by two or more newlines (paragraphs)
+  const parts = text.split(/\n{2,}/).map(p => p.trim()).filter(Boolean);
+  const source = parts.length ? parts[0] : text;
+  if (source.length <= maxLen) return source;
+  // attempt to cut at last space before maxLen to avoid mid-word truncation
+  const cut = source.slice(0, maxLen);
+  const lastSpace = cut.lastIndexOf(' ');
+  return (lastSpace > Math.floor(maxLen * 0.6) ? cut.slice(0, lastSpace) : cut) + '...';
 }
 
 const articleSchema = new Schema(
@@ -157,8 +182,7 @@ articleSchema.statics.searchPublic = function (query, options = {}) {
     .limit(limit);
 };
 
-// Pre-validate hook: generate unique slug when creating or title changes.
-// Use pre('validate') so slug exists for schema validation.
+
 articleSchema.pre('validate', async function (next) {
   try {
     // generate slug if missing or title changed
@@ -175,7 +199,6 @@ articleSchema.pre('validate', async function (next) {
       };
 
       // check for collisions and append suffix if needed
-      // loop is acceptable for small number of collisions
       while (await mongoose.models.Article.exists(existsFilter(candidate))) {
         counter += 1;
         candidate = `${base}-${counter}`;
@@ -184,7 +207,15 @@ articleSchema.pre('validate', async function (next) {
       this.slug = candidate;
     }
 
-    // preserve your publishDate logic
+    // auto-generate preview when missing and body exists
+    if ((!this.preview || String(this.preview).trim().length === 0) && this.body) {
+      // generate with 200-char max preview (you may change to 300/500)
+      const generated = makePreviewFromBody(this.body, 200);
+      // ensure it respects maxlength (500)
+      this.preview = generated.slice(0, 500);
+    }
+
+    // preserve publishDate logic
     if (this.isModified('status') && this.status === 'approved' && !this.publishDate) {
       this.publishDate = new Date();
     }

@@ -69,7 +69,8 @@ const getArticles = asyncHandler(async (req, res) => {
   // Search path (public-only, approved + not deleted)
   if (q && typeof q === 'string' && q.trim().length > 0) {
     const [items, total] = await Promise.all([
-      Article.searchPublic(q, { page, limit }),
+      // searchPublic returns a Query — we can populate it
+      Article.searchPublic(q, { page, limit }).populate('author', 'name'),
       Article.countDocuments({
         $text: { $search: q },
         status: 'approved',
@@ -100,7 +101,8 @@ const getArticles = asyncHandler(async (req, res) => {
       Article.find(filter)
         .sort({ publishDate: -1, createdAt: -1 })
         .skip((page - 1) * limit)
-        .limit(limit),
+        .limit(limit)
+        .populate('author', 'name'),
       Article.countDocuments(filter),
     ]);
 
@@ -120,8 +122,17 @@ const getArticles = asyncHandler(async (req, res) => {
   if (author) publicFilter.author = author;
   if (tag) publicFilter.tags = tag;
 
+  // Article.findApproved returns a Query, so we can populate it directly
+  const itemsQuery = Article.findApproved
+    ? Article.findApproved(publicFilter, { page, limit }).populate('author', 'name')
+    : Article.find({ status: 'approved', deleted: false, ...publicFilter })
+        .sort({ publishDate: -1, createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .populate('author', 'name');
+
   const [items, total] = await Promise.all([
-    Article.findApproved(publicFilter, { page, limit }),
+    itemsQuery,
     Article.countDocuments({ status: 'approved', deleted: false, ...publicFilter }),
   ]);
 
@@ -145,14 +156,15 @@ const getArticleById = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { actorId, isAdmin } = getActor(req);
 
-  const article = await Article.findById(id);
+  // populate the author name
+  const article = await Article.findById(id).populate('author', 'name');
 
   if (!article || article.deleted) {
     return res.status(404).json({ message: 'Article not found' });
   }
 
   const isOwner =
-    actorId && article.author && article.author.toString() === actorId.toString();
+    actorId && article.author && article.author._id && article.author._id.toString() === actorId.toString();
 
   if (article.status !== 'approved' && !isAdmin && !isOwner) {
     return res.status(403).json({ message: 'You are not allowed to view this article' });
@@ -167,7 +179,8 @@ const getArticleById = asyncHandler(async (req, res) => {
 const getArticleBySlug = asyncHandler(async (req, res) => {
   const { slug } = req.params;
 
-  const article = await Article.findBySlug(slug);
+  // populate author
+  const article = await Article.findBySlug(slug).populate('author', 'name');
 
   if (!article) {
     return res.status(404).json({ message: 'Article not found' });
@@ -212,7 +225,11 @@ const postArticle = asyncHandler(async (req, res) => {
   });
 
   const saved = await article.save();
-  return res.status(201).json(saved);
+
+  // populate author before returning
+  const populated = await Article.findById(saved._id).populate('author', 'name');
+
+  return res.status(201).json(populated);
 });
 
 /**
@@ -246,7 +263,10 @@ const updateArticle = asyncHandler(async (req, res) => {
   Object.assign(article, update);
 
   const updated = await article.save();
-  return res.json(updated);
+  // populate author for the response
+  const populated = await Article.findById(updated._id).populate('author', 'name');
+
+  return res.json(populated);
 });
 
 /**
@@ -294,7 +314,8 @@ const getMyArticles = asyncHandler(async (req, res) => {
     Article.find({ author: actorId, deleted: false })
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
-      .limit(limit),
+      .limit(limit)
+      .populate('author', 'name'),
     Article.countDocuments({ author: actorId, deleted: false }),
   ]);
 

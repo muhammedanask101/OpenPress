@@ -2,12 +2,29 @@
 
 const Article = ({ article }) => {
 
+  const authorName =
+    article.author && typeof article.author === "object"
+      ? article.author.name
+      : "Unknown Author";
+
+  const preview =
+    article.preview?.trim() ||
+    article.excerpt?.trim() ||
+    (article.body
+      ? article.body.slice(0, 200) + (article.body.length > 200 ? "..." : "")
+      : "");
+
+    const handleClick = () => {
+
+    }
+
   return (
-    <div className="p-8 bg-neutral-950 shadow-md shadow-blue-300 w-full max-w-md rounded-xl text-center">
-      <h2 className="text-lg md:text-xl text-shadow-2xs text-shadow-amber-400 font-bold font-sans mt-2 mb-8">{article.title}</h2>
-      <p className="text-sm md:text-[15px] m-2 font-google-sans">{article.description}</p>
-      <div className="m-5 font-sans text-blue-300 hover:text-red-500"> <a href={article.fileurl} target="_blank" rel="noopener noreferrer">view article</a> </div>
-      <div className="font-google-sans text-sm">{new Date(article.createdAt).toLocaleString('en-US')}</div>
+    <div className="p-3 bg-white shadow-md border-2 border-black w-full rounded-xl text-left ml-2 " onClick={handleClick()}>
+      <h2 className="text-[17px] md:text-xl text-shadow-2xs text-black font-bold font-sans mb-1 hover:text-yellow-500">{article.title}</h2>
+      <p className="text-sm md:text-[15px] font-google-sans text-red-600 hover:text-blue-700 mb-3 mdmb-2">{authorName}</p>
+      <div className="font-sans text-[14px] md:text-[16px] text-black mb-4 md:mb-3"> {preview} </div>
+      <p className="font-google-sans text-black text-[12px] md:text-sm">Published at {new Date(article.createdAt).toLocaleString("en-US", 
+      { year: "numeric", month: "long", day: "numeric" })}</p>
     </div>
   )
 }

@@ -21,7 +21,7 @@ const ArticleArray = () => {
     return(
         isLoading ? <FallbackLoading /> : (
             <>
-                <section className="grid grid-cols-1 justify-items-center md:grid-cols-2 xl:grid-cols-4 gap-8 p-4">
+                <section className="grid grid-cols-1 justify-items-center gap-4 p-4 md:p-8">
                     {Array.isArray(articles) && articles.length > 0 ? 
                     (articles.map(article => <Article key={article._id} article={article} />)) : (
                         <p className="text-red-600">No articles to display yet.</p>
