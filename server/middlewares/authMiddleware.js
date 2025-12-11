@@ -25,6 +25,43 @@ const verifyUserToken = (token) => {
   return jwt.verify(token, secret);
 };
 
+const authEither = asyncHandler(async (req, res, next) => {
+  const token = getBearerToken(req);
+  if (!token) {
+ 
+    return next();
+  }
+
+ 
+  try {
+    const decodedAdmin = verifyAdminToken(token);
+    if (decodedAdmin && decodedAdmin.type === 'admin') {
+      const Admin = require('../models/adminModel');
+      const admin = await Admin.findById(decodedAdmin.id).select('-password');
+      if (admin && !admin.deleted) {
+        req.admin = admin;
+        return next();
+      }
+    }
+  } catch (err) {
+  }
+
+
+  try {
+    const decodedUser = verifyUserToken(token);
+    if (decodedUser && decodedUser.type === 'user') {
+      const User = require('../models/usermodel');
+      const user = await User.findById(decodedUser.id).select('-password');
+      if (user && !user.banned) {
+        req.user = user;
+        return next();
+      }
+    }
+  } catch (err) {
+  }
+
+  return next();
+});
 
 const protect = asyncHandler(async (req, res, next) => {
   const token = getBearerToken(req);
@@ -92,4 +129,4 @@ const userprotect = asyncHandler(async (req, res, next) => {
   }
 });
 
-module.exports = { protect, userprotect };
+module.exports = { authEither, protect, userprotect };

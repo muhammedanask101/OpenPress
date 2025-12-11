@@ -12,7 +12,7 @@ const {
   getMyArticles,
 } = require('../controllers/articleController');
 
-const { userprotect, protect } = require('../middlewares/authMiddleware');
+const { userprotect, protect, authEither } = require('../middlewares/authMiddleware');
 const { sanitizeMiddleware, validateBody, schemas, } = require('../middlewares/sanitizeMiddleware');
 
 //public
@@ -21,7 +21,7 @@ const { sanitizeMiddleware, validateBody, schemas, } = require('../middlewares/s
 router.get('/getarticles', sanitizeMiddleware, getArticles);
 
 // Get article by slug (public, increments views)
-router.get('/getarticles/slug/:slug', sanitizeMiddleware, getArticleBySlug);
+router.get('/slug/:slug', sanitizeMiddleware, getArticleBySlug);
 
 // Get article by ID (public; non-approved restricted in controller)
 router.get('/getarticles/:id', sanitizeMiddleware, getArticleById);
@@ -32,7 +32,7 @@ router.get('/getarticles/:id', sanitizeMiddleware, getArticleById);
 router.post( '/postarticle', sanitizeMiddleware, userprotect, validateBody(schemas.articleCreate), postArticle );
 
 // Update article – only owner user can update (controller checks ownership)
-router.put( '/updatearticle/:id', sanitizeMiddleware, protect, validateBody(schemas.articleUpdate), updateArticle );
+router.put( '/updatearticle/:id', sanitizeMiddleware, authEither, validateBody(schemas.articleUpdate), updateArticle );
 
 // Delete article (soft delete) – only owner user can delete
 router.delete( '/deletearticles/:id', sanitizeMiddleware, protect, deleteArticle );
