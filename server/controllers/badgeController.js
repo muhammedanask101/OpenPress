@@ -2,7 +2,7 @@
 const asyncHandler = require('express-async-handler');
 const Badge = require('../models/badgeModel');
 const BadgeOf = require('../models/badgeOfModel');
-const User = require('../models/usermodel'); // only for sanity checks; adjust path if needed
+const User = require('../models/temp'); // only for sanity checks; adjust path if needed
 
 // @desc    Create a new badge (ADMIN ONLY)
 // @route   POST /api/badges

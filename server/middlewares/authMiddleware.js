@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const asyncHandler = require('express-async-handler');
 const Admin = require('../models/adminModel');
-const User = require('../models/usermodel');
+const User = require('../models/temp');
 
 const getBearerToken = (req) => {
   const auth = req.headers.authorization || '';
@@ -50,7 +50,7 @@ const authEither = asyncHandler(async (req, res, next) => {
   try {
     const decodedUser = verifyUserToken(token);
     if (decodedUser && decodedUser.type === 'user') {
-      const User = require('../models/usermodel');
+      const User = require('../models/temp');
       const user = await User.findById(decodedUser.id).select('-password');
       if (user && !user.banned) {
         req.user = user;
