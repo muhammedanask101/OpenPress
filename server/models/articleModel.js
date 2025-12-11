@@ -94,6 +94,11 @@ const articleSchema = new Schema(
       default: 0,
       min: 0,
     },
+    isFeatured: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
     deleted: {
       type: Boolean,
       default: false,

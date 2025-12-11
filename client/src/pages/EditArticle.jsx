@@ -230,7 +230,7 @@ export default function EditArticle() {
             disabled={!canEdit}
           />
         </div>
-
+{admin &&
         <div className="grid grid-cols-2 gap-2 md:gap-4">
           {/* Slug - visible / editable only to admins */}
           <div>
@@ -268,6 +268,7 @@ export default function EditArticle() {
             )}
           </div>
         </div>
+}
 
         <div>
           <label className="block text-[14px] md:text-sm font-medium mb-1">Preview (optional)</label>

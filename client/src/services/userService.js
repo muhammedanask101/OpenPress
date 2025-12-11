@@ -75,7 +75,6 @@ const softDeleteSelf = async () => {
   return response.data;
 };
 
-// admin operations
 
 const getUserById = async (id) => {
   const response = await axios.get(`${API_URL}getuser/${id}`, authConfig());
