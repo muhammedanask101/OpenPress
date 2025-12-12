@@ -26,7 +26,6 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
-app.options('(.*)', cors());
 app.use(express.json({ limit: '1mb' }));
 app.use(hpp());
 app.use(sanitizeMiddleware);
