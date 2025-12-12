@@ -31,6 +31,9 @@ app.use(hpp());
 app.use(sanitizeMiddleware);
 app.use('/api', apiLimiter);
 // app.use maintenance middleware
+app.get("/", (req, res) => {
+  res.send("Backend is alive...");
+});
 app.use('/api/articles', require('./routes/articleRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
 app.use('/api/contact', require('./routes/contactRoutes'));
