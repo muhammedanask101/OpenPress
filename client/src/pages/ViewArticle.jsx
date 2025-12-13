@@ -67,9 +67,9 @@ const ViewArticle = () => {
 
   return (
     <main className="max-w-4xl bg-white md:bg-transparent mx-auto p-5">
-      <header className="mb-8">
-        <h1 className="text-xl md:text-3xl text-black font-inter font-bold mb-1 md:mb-2">{article.title}</h1>
-        <div className="text-[13px] mt-4 md:text-[15px] text-black">
+      <header className="mt-4 mb-8">
+        <h1 className="text-3xl md:text-3xl text-black font-inter font-bold mb-1 md:mb-2">{article.title}</h1>
+        <div className="text-[13px] mt-8 md:text-[15px] text-black">
           <span className="font-medium text-red-700 hover:text-blue-800">{authorName}</span>
           <span className="mx-1">•</span>
           <span>
