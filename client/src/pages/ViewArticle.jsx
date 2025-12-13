@@ -68,8 +68,8 @@ const ViewArticle = () => {
   return (
     <main className="max-w-4xl my-2  mx-auto p-2">
       <header className="mb-5">
-        <h1 className="text-lg md:text-3xl text-black font-inter font-bold mb-1 md:mb-2">{article.title}</h1>
-        <div className="text-[12px] md:text-[15px] text-black">
+        <h1 className="text-xl md:text-3xl text-black font-inter font-bold mb-1 md:mb-2">{article.title}</h1>
+        <div className="text-[13px] md:text-[15px] text-black">
           <span className="font-medium text-red-700 hover:text-blue-800">{authorName}</span>
           <span className="mx-1">•</span>
           <span>
@@ -82,12 +82,8 @@ const ViewArticle = () => {
         </div>
       </header>
 
-      <article className="prose max-w-none font-merriweather text-[14px] md:mt-7 md:text-[19px] text-black leading-relaxed ">
-        {isHtml ? (
-          <div dangerouslySetInnerHTML={{ __html: article.body }} />
-        ) : (
-          <div >{article.body}</div>
-        )}
+      <article className="prose max-w-none font-merriweather text-[16px] md:mt-7 md:text-[19px] text-black leading-relaxed ">
+          <div className="whitespace-pre-line">{article.body}</div>
       </article>
     </main>
   );
