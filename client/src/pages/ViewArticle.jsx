@@ -67,7 +67,7 @@ const ViewArticle = () => {
 
   return (
     <main className="max-w-4xl bg-white md:bg-transparent mx-auto p-5">
-      <header className="mb-5">
+      <header className="mb-8">
         <h1 className="text-xl md:text-3xl text-black font-inter font-bold mb-1 md:mb-2">{article.title}</h1>
         <div className="text-[13px] mt-4 md:text-[15px] text-black">
           <span className="font-medium text-red-700 hover:text-blue-800">{authorName}</span>
@@ -82,7 +82,7 @@ const ViewArticle = () => {
         </div>
       </header>
 
-      <article className="prose max-w-none font-merriweather text-[15px] md:mt-7 md:text-[19px] text-black leading-relaxed ">
+      <article className="prose max-w-none font-merriweather text-[16px] md:mt-7 md:text-[19px] text-black leading-relaxed ">
           <div className="whitespace-pre-line">{article.body}</div>
       </article>
     </main>
