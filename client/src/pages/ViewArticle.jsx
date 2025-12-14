@@ -4,6 +4,39 @@ import { useSelector, useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
 import { getArticleBySlug, reset } from '../slices/ArticleSlice';
 import FallbackLoading from '../components/FallbackLoading';
+import { fetchMediaForItem } from "../slices/mediaSlice";
+
+function renderArticleBody(body, mediaMap) {
+  const parts = body.split(/\[\[media:(.*?)\]\]/g);
+
+  return parts.map((part, i) => {
+    if (i % 2 === 1) {
+
+      const media = mediaMap[part];
+      if (!media) {
+        return (
+          <div key={part} className="my-6 text-sm text-gray-400 italic">
+            [Image loading…]
+          </div>
+        );
+      }
+
+
+      return (
+        <figure key={part} className="my-6">
+          <img
+            src={media.url}
+            className="w-full max-w-full h-auto rounded-lg mx-auto"
+            loading="lazy"
+          />
+        </figure>
+      );
+    }
+
+    return <p key={i}>{part}</p>;
+  });
+}
+
 
 const ViewArticle = () => {
   const { slug } = useParams();
@@ -20,6 +53,27 @@ const ViewArticle = () => {
   const isError = !!articlesSlice.isError;
   const isSuccess = !!articlesSlice.isSuccess;
   const message = articlesSlice.message || '';
+
+  useEffect(() => {
+    if (article?.id) {
+      dispatch(fetchMediaForItem({ kind: "article", itemId: article.id }));
+    }
+  }, [article?.id, dispatch]);
+
+  const { itemMedia } = useSelector(s => s.media);
+
+
+  const mediaList =
+    article?.id && itemMedia[`article:${article.id}`]
+      ? itemMedia[`article:${article.id}`]
+      : [];
+
+  const mediaMap = Object.fromEntries(
+    mediaList.map(m => [String(m.id), m])
+  );
+
+
+
 
   // Fetch once per slug (ref guard prevents double-dispatch in dev StrictMode)
   useEffect(() => {
@@ -62,8 +116,6 @@ const ViewArticle = () => {
   const authorName =
     article.author && typeof article.author === 'object' ? article.author.name : 'Unknown author';
 
-  // detect if body contains HTML tags (only render as HTML if server sanitized)
-  const isHtml = /<\/?[a-z][\s\S]*>/i.test(article.body || '');
 
   return (
     <main className="max-w-4xl bg-white md:bg-transparent mx-auto p-5">
@@ -82,8 +134,8 @@ const ViewArticle = () => {
         </div>
       </header>
 
-      <article className="prose max-w-none font-merriweather text-[16px] md:mt-7 md:text-[19px] text-black leading-relaxed ">
-          <div className="whitespace-pre-line">{article.body}</div>
+      <article className="prose max-w-none overflow-x-hidden font-merriweather text-[16px] md:mt-7 md:text-[19px] text-black leading-relaxed ">
+          <div className="whitespace-pre-line">{renderArticleBody(article.body, mediaMap)}</div>
       </article>
     </main>
   );

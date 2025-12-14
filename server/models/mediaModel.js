@@ -112,6 +112,8 @@ MediaSchema.index(
   { unique: true }
 );
 
+MediaSchema.index({ 'usedin.kind': 1, 'usedin.item': 1 });
+
 // list by uploader
 // MediaSchema.index({ uploadedBy: 1, createdAt: -1 });
 

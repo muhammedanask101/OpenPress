@@ -1,9 +1,11 @@
 import ArticleArray from '../components/ArticleArray';
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
 
 const ArticleList = () => {
+    
+    const { state } = useLocation();
 
     const navigate = useNavigate();
     const { user } = useSelector(state => state.user);
@@ -18,6 +20,12 @@ const ArticleList = () => {
             <div className='md:mr-4 mr-1 text-right my-3 md:my-4'>
             <Link className='text-[13px] p-2 font-bold md:text-[15px] md:font-extrabold border-2 md:p-3 rounded-lg bg-blue-300 border-black text-black' to="/postarticle">Post Article</Link>
             </div>
+            {state?.success && (
+                <div className="mb-3 p-2 bg-green-100 text-green-700 rounded">
+                    {state.success}
+                </div>
+                )
+            }
             <ArticleArray />
         </section>
     )

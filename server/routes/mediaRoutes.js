@@ -42,7 +42,7 @@ router.get('/by-key/search', protect, getMediaByKey);
 router.delete('/:id', protect, softDeleteMedia);
 
 // Attach usage to media
-router.post('/:id/attach', protect, attachMediaUsage);
+router.post('/:id/attach', userprotect, attachMediaUsage);
 
 // Clear usage on media
 router.post('/:id/clear-usage', protect, clearMediaUsage);

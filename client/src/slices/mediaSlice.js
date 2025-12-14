@@ -5,6 +5,7 @@ import {
   isRejected,
 } from "@reduxjs/toolkit";
 import mediaService from "../services/mediaService";
+import axios from "axios";
 
 const initialState = {
   myMedia: [],
@@ -127,18 +128,32 @@ export const adminSoftDeleteMedia = createAsyncThunk(
 );
 
 // ADMIN: attach usage
-export const adminAttachMediaUsage = createAsyncThunk(
-  "media/adminAttachMediaUsage",
+export const attachMediaUsage = createAsyncThunk(
+  "media/attachUsage",
   async ({ id, kind, itemId }, thunkAPI) => {
     try {
-      return await mediaService.attachMediaUsage(id, { kind, itemId });
+      const token = JSON.parse(localStorage.getItem("user"))?.token;
+
+      const res = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/media/${id}/attach`,
+        { kind, itemId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      return res.data;
     } catch (err) {
-      const msg =
-        err.response?.data?.message || err.message || err.toString();
-      return thunkAPI.rejectWithValue(msg);
+      return thunkAPI.rejectWithValue(
+        err.response?.data?.message || err.message
+      );
     }
   }
 );
+
 
 // ADMIN: clear usage
 export const adminClearMediaUsage = createAsyncThunk(
@@ -289,7 +304,7 @@ export const mediaSlice = createSlice({
       })
 
       // ADMIN: attach usage
-      .addCase(adminAttachMediaUsage.fulfilled, (state, action) => {
+      .addCase(attachMediaUsage.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
 
@@ -354,7 +369,7 @@ export const mediaSlice = createSlice({
           adminFetchMedia,
           adminGetMediaByKey,
           adminSoftDeleteMedia,
-          adminAttachMediaUsage,
+          attachMediaUsage,
           adminClearMediaUsage
         ),
         (state) => {
@@ -374,7 +389,7 @@ export const mediaSlice = createSlice({
           adminFetchMedia,
           adminGetMediaByKey,
           adminSoftDeleteMedia,
-          adminAttachMediaUsage,
+          attachMediaUsage,
           adminClearMediaUsage
         ),
         (state, action) => {

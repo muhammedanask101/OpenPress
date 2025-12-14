@@ -75,9 +75,11 @@ const getMyMedia = async (params = {}) => {
 // GET /api/media/item
 // query: { kind, itemId }
 const getMediaForItem = async ({ kind, itemId }) => {
+
   const response = await axios.get(`${API_URL}item`, {
     params: { kind, itemId },
   });
+
   // returns array of media docs
   return response.data;
 };
@@ -121,13 +123,21 @@ const softDeleteMedia = async (id) => {
 // POST /api/media/:id/attach
 // body: { kind, itemId }
 const attachMediaUsage = async (id, { kind, itemId }) => {
+  const token = JSON.parse(localStorage.getItem("user"))?.token;
+
   const response = await axios.post(
     `${API_URL}${id}/attach`,
     { kind, itemId },
-    adminAuthConfig()
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
   );
+
   // { message, media }
-  return { id, ...response.data };
+  return response.data;
 };
 
 // POST /api/media/:id/clear-usage

@@ -1,6 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const mongoose = require('mongoose');
 const Media = require('../models/mediaModel');
+const Article = require('../models/articleModel');
 
 const DISALLOWED_MEDIA_KINDS = ['comment', 'question', 'answer'];
 
@@ -214,8 +215,11 @@ const softDeleteMedia = asyncHandler(async (req, res) => {
 // @route   POST /api/media/:id/attach
 // @access  Admin (protect)
 const attachMediaUsage = asyncHandler(async (req, res) => {
+
+
   const { id } = req.params;
   const { kind, itemId } = req.body;
+  const user = req.user;
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).json({ message: 'Invalid media id' });
@@ -227,7 +231,6 @@ const attachMediaUsage = asyncHandler(async (req, res) => {
 
   const normalizedKind = String(kind).toLowerCase().trim();
 
-  // comments, questions and answers can't use media
   if (DISALLOWED_MEDIA_KINDS.includes(normalizedKind)) {
     return res.status(400).json({
       message: 'This type of content cannot have media attached',
@@ -243,10 +246,34 @@ const attachMediaUsage = asyncHandler(async (req, res) => {
     return res.status(404).json({ message: 'Media not found' });
   }
 
+  // PERMISSION CHECK
+  if (normalizedKind === 'article') {
+    const article = await Article.findById(itemId);
+    if (!article) {
+      return res.status(404).json({ message: 'Article not found' });
+    }
+
+    const isAuthor =
+      article.author && String(article.author) === String(user._id);
+    const isAdmin = user.role === 'admin';
+
+
+
+    if (!isAuthor && !isAdmin) {
+      return res.status(403).json({
+        message: 'You are not allowed to attach media to this article',
+      });
+    }
+  }
+
   await media.attachUsage(normalizedKind, itemId);
+
+  const updated = await Media.findById(id);
+
 
   res.json({ message: 'Usage attached', media });
 });
+
 
 // @desc    Admin: clear usage from media
 // @route   POST /api/media/:id/clear-usage

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -7,6 +7,10 @@ import {
   updateArticle,
   reset,
 } from "../slices/ArticleSlice";
+import { uploadToCloudinary } from "../utils/uploadToCloudinary";
+import { createMedia } from "../slices/mediaSlice";
+import { useRef } from "react";
+import { attachMediaUsage } from "../slices/mediaSlice";
 
 
 function readCurrentIdentity() {
@@ -62,12 +66,83 @@ export default function EditArticle() {
 
   const [localError, setLocalError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [uploading, setUploading] = useState(false);
+
 
   // permission state
   const [canEdit, setCanEdit] = useState(false);
 
+  const bodyRef = useRef(null);
+
   const idParam = params.id || null;
   const slugParam = params.slug || null;
+
+
+const insertImageAtCursor = (media) => {
+  const textarea = bodyRef.current;
+  if (!textarea) return;
+
+  const token = `\n\n[[media:${media.id}]]\n\n`;
+
+  const start = textarea.selectionStart ?? textarea.value.length;
+  const end = textarea.selectionEnd ?? textarea.value.length;
+
+setBody(prev => {
+  const before = prev.slice(0, start);
+  const after = prev.slice(end);
+  return before + token + after;
+});
+
+
+  // restore cursor just after inserted token
+  requestAnimationFrame(() => {
+    textarea.focus();
+    const pos = start + token.length;
+    textarea.setSelectionRange(pos, pos);
+  });
+};
+
+
+const handleImageUpload = async (file) => {
+  if (!file || uploading) return;
+
+  if (!currentArticle?.id) {
+    alert("Article not loaded yet");
+    return;
+  }
+
+  try {
+    setUploading(true);
+
+    const result = await uploadToCloudinary(file);
+
+    const media = await dispatch(
+      createMedia({
+        key: result.public_id,
+        url: result.secure_url,
+        mimeType: file.type,
+        size: file.size,
+        storageProvider: "cloudinary",
+      })
+    ).unwrap();
+
+    await dispatch(
+      attachMediaUsage({
+        id: media.id,
+        kind: "article",
+        itemId: currentArticle.id,
+      })
+    );
+
+    insertImageAtCursor(media);
+  } catch (err) {
+    console.error(err);
+    alert("Image upload failed");
+  } finally {
+    setUploading(false);
+  }
+};
+
 
   // fetch article
   useEffect(() => {
@@ -181,8 +256,6 @@ export default function EditArticle() {
         return;
       }
       setSuccessMessage("Article updated successfully.");
-      // optionally navigate to article page:
-      // navigate(`/articles/${action.payload?.slug || idToUpdate}`);
     } catch (err) {
       setLocalError(String(err) || "Failed to update article.");
     }
@@ -283,8 +356,29 @@ export default function EditArticle() {
         </div>
 
         <div>
+          <label className="block text-sm font-medium mb-1">Insert Image</label>
+
+          <input
+            type="file"
+            key={uploading ? "uploading" : "idle"}
+            accept="image/*"
+            disabled={uploading || !canEdit}
+              onChange={(e) => {
+              handleImageUpload(e.target.files[0]);
+              e.target.value = "";
+            }}
+            className="block w-full text-sm"
+          />
+
+          {uploading && (
+            <p className="text-xs text-gray-600 mt-1">Uploading image…</p>
+          )}
+        </div>
+
+        <div>
           <label className="block text-sm font-medium mb-1">Body</label>
           <textarea
+            ref={bodyRef}
             name="body"
             value={body}
             onChange={(e) => setBody(e.target.value)}
@@ -345,7 +439,7 @@ export default function EditArticle() {
         <div className="flex items-center gap-3">
           <button
             type="submit"
-            disabled={!canEdit || isUpdating}
+            disabled={!canEdit || isUpdating || uploading}
             className={`px-3 py-1 md:px-4 md:py-2 rounded text-white ${!canEdit ? "bg-gray-400" : "bg-slate-800 hover:opacity-95"}`}
           >
             {isUpdating ? "Saving..." : "Save changes"}

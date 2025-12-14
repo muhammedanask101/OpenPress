@@ -2,13 +2,84 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { createArticle } from "../slices/ArticleSlice";
 import { useNavigate } from "react-router-dom";
+import { uploadToCloudinary } from "../utils/uploadToCloudinary";
+import { createMedia } from "../slices/mediaSlice";
+import { useRef } from "react";
+import { attachMediaUsage } from "../slices/mediaSlice";
+import axios from 'axios';
+
 
 const ArticleForm = () => {
   const [details, setDetails] = useState({ title: "", tags: [], body: "" });
   const [tagInput, setTagInput] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [uploadedMediaIds, setUploadedMediaIds] = useState([]);
   const { title, tags, body } = details;
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const bodyRef = useRef(null);
+
+const insertImageAtCursor = (media) => {
+  const textarea = bodyRef.current;
+  if (!textarea) return;
+
+  const token = `\n\n[[media:${media.id}]]\n\n`;
+
+  const start = textarea.selectionStart ?? textarea.value.length;
+  const end = textarea.selectionEnd ?? textarea.value.length;
+
+  setDetails((prev) => {
+    const before = prev.body.slice(0, start);
+    const after = prev.body.slice(end);
+    return {
+      ...prev,
+      body: before + token + after,
+    };
+  });
+
+  requestAnimationFrame(() => {
+    textarea.focus();
+    const pos = start + token.length;
+    textarea.setSelectionRange(pos, pos);
+  });
+};
+
+
+  const handleImageUpload = async (file) => {
+    if (!file || uploading) return;
+
+
+    try {
+      setUploading(true);
+
+      const result = await uploadToCloudinary(file);
+
+      const media = await dispatch(
+        createMedia({
+          key: result.public_id,
+          url: result.secure_url,
+          mimeType: file.type,
+          size: file.size,
+          storageProvider: "cloudinary",
+        })
+      ).unwrap();
+
+      setUploadedMediaIds(prev =>
+        Array.from(new Set([...prev, media.id]))
+      );
+
+
+      insertImageAtCursor(media);
+
+    } catch (err) {
+      console.error(err);
+      alert("Image upload failed");
+    } finally {
+    setUploading(false); 
+  }
+  };
+
+
 
   const onChange = (e) => {
     const { name, value } = e.target;
@@ -73,10 +144,26 @@ const ArticleForm = () => {
     };
 
     try {
-      await dispatch(createArticle(articleData)).unwrap();
+      const createdArticle = await dispatch(
+          createArticle(articleData)
+        ).unwrap();
+
+      await Promise.all(
+        uploadedMediaIds.map((mediaId) =>
+          dispatch(
+            attachMediaUsage({
+              id: mediaId,
+              kind: "article",
+              itemId: createdArticle.id,
+            })
+          ).unwrap()
+        )
+      );
+
       setDetails({ title: "", body: "", tags: []});
       setTagInput("");
-      navigate("/articles"); // optional
+      navigate("/articles", {
+        state: { success: "Article posted successfully! It will be visible once an admin approves it." }});
     } catch (error) {
       console.error("Article creation failed: ", error);
       // show toast / UI error as appropriate
@@ -146,10 +233,47 @@ const ArticleForm = () => {
           </div>
         </div>
 
+        {/* Image Upload */}
+        <div>
+          <label className="block text-amber-100 font-medium">
+            Insert Image
+          </label>
+
+          <input
+            type="file"
+            key={uploading ? "uploading" : "idle"}
+            accept="image/*"
+            disabled={uploading}
+            onChange={(e) => {
+              handleImageUpload(e.target.files[0]);
+              e.target.value = "";
+            }
+            }
+            className="mt-1 block w-full text-sm text-white
+                      file:mr-4 file:py-2 file:px-4
+                      file:rounded-md file:border-0
+                      file:text-sm file:font-semibold
+                      file:bg-yellow-500 file:text-black
+                      hover:file:opacity-90
+                      disabled:opacity-50"
+          />
+
+          {uploading && (
+            <p className="text-xs text-amber-100 mt-1">
+              Uploading image…
+            </p>
+          )}
+
+          <p className="text-xs text-amber-100 mt-1">
+            Image will be inserted at the cursor position
+          </p>
+        </div>
+
         {/* Body */}
         <div>
           <label htmlFor="body" className="block text-amber-100 font-medium">Article Body:</label>
           <textarea
+            ref={bodyRef}
             id="body"
             name="body"
             rows={10}
@@ -160,11 +284,13 @@ const ArticleForm = () => {
           />
         </div>
 
+
         <button
           type="submit"
-          className="flex w-full justify-center mt-2 bg-yellow-500 text-white font-semibold py-2 px-4 rounded-md"
+          disabled={uploading}
+          className={`flex w-full justify-center mt-2 bg-yellow-500 text-white font-semibold py-2 px-4 rounded-md ${uploading ? "opacity-50 cursor-not-allowed" : ""}`}
         >
-          Post
+          {uploading ? "Uploading image…" : "Post"}
         </button>
       </form>
     </section>
