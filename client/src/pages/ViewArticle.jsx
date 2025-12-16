@@ -7,35 +7,170 @@ import FallbackLoading from '../components/FallbackLoading';
 import { fetchMediaForItem } from "../slices/mediaSlice";
 
 function renderArticleBody(body, mediaMap) {
-  const parts = body.split(/\[\[media:(.*?)\]\]/g);
+  if (!body) return null;
 
-  return parts.map((part, i) => {
-    if (i % 2 === 1) {
+  /* -------------------------------
+     Extract references
+  -------------------------------- */
+  const referenceRegex = /^\[\^(\w+)\]:\s*(.+)$/gm;
+  const references = {};
+  let match;
 
-      const media = mediaMap[part];
-      if (!media) {
-        return (
-          <div key={part} className="my-6 text-sm text-gray-400 italic">
-            [Image loading…]
-          </div>
-        );
+  while ((match = referenceRegex.exec(body)) !== null) {
+    references[match[1]] = match[2];
+  }
+
+  // Remove reference definitions from main body
+  const cleanBody = body.replace(referenceRegex, '').trim();
+
+  /* -------------------------------
+     Split media blocks
+  -------------------------------- */
+  const parts = cleanBody.split(/\[\[media:(.*?)\]\]/g);
+
+  /* -------------------------------
+     Inline formatter
+  -------------------------------- */
+  const formatInline = (text) => {
+    const tokens = [];
+    let remaining = text;
+    let key = 0;
+
+    const patterns = [
+      { regex: /^\[\^(\w+)\]/, type: 'footnote' },
+      { regex: /^\*\*(.+?)\*\*/, type: 'bold' },
+      { regex: /^\*(.+?)\*/, type: 'italic' },
+      { regex: /^\[(.+?)\]\((.+?)\)/, type: 'link' },
+    ];
+
+    while (remaining.length) {
+      let matched = false;
+
+      for (const { regex, type } of patterns) {
+        const m = remaining.match(regex);
+        if (!m) continue;
+
+        const [full, a, b] = m;
+
+        if (type === 'footnote') {
+          tokens.push(
+            <sup key={key++} className="text-xs ml-0.5">
+              <a href={`#ref-${a}`} className="text-blue-600">
+                [{a}]
+              </a>
+            </sup>
+          );
+        }
+
+        if (type === 'bold') tokens.push(<strong key={key++}>{a}</strong>);
+        if (type === 'italic') tokens.push(<em key={key++}>{a}</em>);
+        if (type === 'link') {
+          tokens.push(
+            <a
+              key={key++}
+              href={b}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 underline"
+            >
+              {a}
+            </a>
+          );
+        }
+
+        remaining = remaining.slice(full.length);
+        matched = true;
+        break;
       }
 
+      if (!matched) {
+        tokens.push(remaining[0]);
+        remaining = remaining.slice(1);
+      }
+    }
 
-      return (
-        <figure key={part} className="my-6">
-          <img
-            src={media.url}
-            className="w-full max-w-full h-auto rounded-lg mx-auto"
-            loading="lazy"
-          />
+    return tokens;
+  };
+
+  /* -------------------------------
+     Render blocks
+  -------------------------------- */
+  const content = parts.map((part, i) => {
+    // MEDIA
+    if (i % 2 === 1) {
+      const media = mediaMap[part];
+      return media ? (
+        <figure key={`media-${part}`} className="my-8">
+          <img src={media.url} loading="lazy" className="rounded-lg mx-auto" />
         </figure>
+      ) : (
+        <div key={`media-${part}`} className="italic text-gray-400 my-6">
+          [Image loading…]
+        </div>
       );
     }
 
-    return <p key={i}>{part}</p>;
+    // TEXT
+    return part.split('\n').map((line, idx) => {
+      const t = line.trim();
+      if (!t) return null;
+
+      // Subtitle
+      const sub = t.match(/^_(.+)_$/);
+      if (sub) {
+        return (
+          <h3
+            key={`sub-${i}-${idx}`}
+            className="mt-10 mb-4 text-xl md:text-2xl font-semibold text-red-700"
+          >
+            {sub[1]}
+          </h3>
+        );
+      }
+
+      // Bullet
+      if (t.startsWith('- ')) {
+        return (
+          <ul key={`ul-${i}-${idx}`} className="list-disc ml-6 my-3">
+            <li>{formatInline(t.slice(2))}</li>
+          </ul>
+        );
+      }
+
+      return (
+        <p key={`p-${i}-${idx}`} className="my-3">
+          {formatInline(line)}
+        </p>
+      );
+    });
   });
+
+  /* -------------------------------
+     Render references
+  -------------------------------- */
+  const referenceList = Object.entries(references);
+
+  return (
+    <>
+      {content}
+
+      {referenceList.length > 0 && (
+        <section className="mt-14 pt-6 border-t">
+          <h3 className="text-lg font-semibold mb-4">References</h3>
+          <ol className="list-decimal ml-6 space-y-2 text-sm">
+            {referenceList.map(([id, text]) => (
+              <li key={id} id={`ref-${id}`}>
+                {text}
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
+    </>
+  );
 }
+
+
 
 
 const ViewArticle = () => {

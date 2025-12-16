@@ -217,7 +217,7 @@ export default function Home() {
               </h2>
               <p className="mt-3 text-base text-red-800">
                 We are a community platform that connects Muslims in <span className="font-semibold text-yellow-600">Kerala</span>.
-                Share advice, write guides, promote learning, and build connections with us. Together we make a supportive space to share knowledge and connect.
+                Share advice, write guides, promote learning, and ask questions with us. Together we make a supportive space to share knowledge and to ask questions!
               </p>
 
               <ul className="mt-4 space-y-2 text-sm text-red-900">
@@ -227,7 +227,7 @@ export default function Home() {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="w-2 h-2 rounded-full bg-yellow-500 inline-block mt-2" />
-                  Member-created content and event listings.
+                  Member-created and fact-checked content.
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="w-2 h-2 rounded-full bg-yellow-500 inline-block mt-2" />
@@ -381,9 +381,11 @@ export default function Home() {
 
           <div className="bg-white rounded p-4 shadow">
             <h4 className="font-semibold mb-2">Get Involved</h4>
-            <p className="text-sm text-gray-600">Write, moderate or help organize local events? sign up to volunteer.</p>
+            <p className="text-sm text-gray-600">Write, moderate or help answer questions? sign up to volunteer.</p>
             <div className="mt-3">
-              <button onClick={() => navigate('/contact')} className="px-3 py-2 bg-yellow-500 text-white rounded">Volunteer</button>
+              <button className="px-3 py-2 bg-yellow-500 text-white rounded">
+                <a href="https://discord.gg/GnBeB7bhvc" target="_blank" rel="noopener noreferrer">Volunteer</a>
+              </button>
             </div>
           </div>
 
