@@ -71,13 +71,6 @@ export default function Sitout() {
   const [tagFilter, setTagFilter] = useState("");
   const [newestLimit, setNewestLimit] = useState(12);
 
-  const { user } = useSelector(state => state.user);
-
-    useEffect(() => {
-        if (user) navigate('/home')
-    }, [user, navigate])
-
-
   useEffect(() => {
     setLocalMessage("");
     dispatch(getArticles());

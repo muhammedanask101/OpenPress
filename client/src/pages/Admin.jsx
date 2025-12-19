@@ -1,16 +1,9 @@
 import ArticleForm from "../components/articleForm";
 import DeleteList from "../components/DeleteList";
-import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { useEffect } from "react";
+
 
 export default function Admin() {
-    const navigate = useNavigate();
-    const { admin } = useSelector(state => state.admin);
 
-    useEffect(() => {
-        if (!admin) navigate('/adminlogin')
-    }, [admin, navigate])
 
     return (
         <>

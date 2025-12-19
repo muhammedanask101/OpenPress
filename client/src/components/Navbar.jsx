@@ -14,6 +14,15 @@ const Navbar = () => {
   const { admin } = useSelector(state => state.admin);
   const { user } = useSelector(state => state.user);
 
+  /* -------- ACTIVE PAGE HELPERS (ADDED) -------- */
+  const isActive = (path) =>
+    location.pathname === path ||
+    location.pathname.startsWith(path + "/");
+
+  const activeClass = "text-blue-700 font-bold";
+  const inactiveClass = "hover:text-blue-700";
+  /* -------------------------------------------- */
+
   const handleLogout = () => {
     dispatch(logoutAdmin());
     dispatch(reset());
@@ -26,7 +35,7 @@ const Navbar = () => {
   const handleUserLogout = () => {
     dispatch(logoutUser());
     dispatch(reset());
-    if(admin){
+    if (admin) {
       dispatch(logoutAdmin());
       dispatch(reset());
     }
@@ -41,57 +50,133 @@ const Navbar = () => {
           <Link to="/">Kerala Muslims</Link>
         </div>
 
+        {/* ---------------- DESKTOP ---------------- */}
         <div className="hidden md:flex mr-4 text-2xl font-bold space-x-4">
-          { user && <Link to="/home" className="hover:text-blue-700">Home</Link> }
-          { user && <Link to="/articles" className="hover:text-blue-700">Articles</Link> }
-          { user && <Link to="/contact" className="hover:text-blue-700">Contact</Link> }
-          { !user && (location.pathname.startsWith("/login") || location.pathname.startsWith("/register")) && <Link to="/" className="hover:text-blue-700 font-bold">Home</Link>}
-          { !user && location.pathname.startsWith("/login") && <Link to="/register" className="hover:text-blue-700 font-bold">Register</Link> }
-          { !user && location.pathname.startsWith("/register") && <Link to="/login" className="hover:text-blue-700 font-bold">Login</Link> }
-          { !user && location.pathname.startsWith("/") && !(location.pathname.startsWith("/login") || location.pathname.startsWith("/register")) && <Link to="/login" className="hover:text-blue-700 font-bold">Login</Link> }
-          { !user && location.pathname.startsWith("/") && !(location.pathname.startsWith("/login") || location.pathname.startsWith("/register")) && <Link to="/register" className="hover:text-blue-700 font-bold">Register</Link> }
-          {user && admin && !(location.pathname.startsWith("/admin")) &&
-          <Link to="/admin" className="hover:text-yellow-500">Admin</Link>}
-          {admin && location.pathname.startsWith("/admin") && 
-          ( <button onClick={handleLogout} className='hover:text-red-500 transition'>Logout</button> )}
-          {user && !(location.pathname.startsWith("/admin")) &&
-          ( <button onClick={handleUserLogout} className='hover:text-red-500 transition'>Logout</button> )}
+          {user && (
+            <>
+              <Link to="/home" className={isActive("/home") ? activeClass : inactiveClass}>
+                Home
+              </Link>
+              <Link to="/articles" className={isActive("/articles") ? activeClass : inactiveClass}>
+                Articles
+              </Link>
+              <Link to="/contact" className={isActive("/contact") ? activeClass : inactiveClass}>
+                Contact
+              </Link>
+            </>
+          )}
+
+          {!user && (location.pathname.startsWith("/login") || location.pathname.startsWith("/register")) && (
+            <Link to="/" className={isActive("/") ? activeClass : inactiveClass}>
+              Home
+            </Link>
+          )}
+
+          {!user && location.pathname.startsWith("/login") && (
+            <Link to="/register" className={isActive("/register") ? activeClass : inactiveClass}>
+              Register
+            </Link>
+          )}
+
+          {!user && location.pathname.startsWith("/register") && (
+            <Link to="/login" className={isActive("/login") ? activeClass : inactiveClass}>
+              Login
+            </Link>
+          )}
+
+          {!user && location.pathname.startsWith("/") &&
+            !(location.pathname.startsWith("/login") || location.pathname.startsWith("/register")) && (
+              <>
+                <Link to="/login" className={isActive("/login") ? activeClass : inactiveClass}>
+                  Login
+                </Link>
+                <Link to="/register" className={isActive("/register") ? activeClass : inactiveClass}>
+                  Register
+                </Link>
+              </>
+            )}
+
+          {user && admin && !location.pathname.startsWith("/admin") && (
+            <Link to="/admin" className={isActive("/admin") ? activeClass : "hover:text-yellow-500"}>
+              Admin
+            </Link>
+          )}
+
+          {admin && location.pathname.startsWith("/admin") && (
+            <button onClick={handleLogout} className="hover:text-red-500 transition">
+              Logout
+            </button>
+          )}
+
+          {user && !location.pathname.startsWith("/admin") && (
+            <button onClick={handleUserLogout} className="hover:text-red-500 transition">
+              Logout
+            </button>
+          )}
         </div>
 
+        {/* ---------------- MOBILE TOGGLE ---------------- */}
         <div className="md:hidden text-md mr-2">
-          <div className='space-x-2'>
-            <button onClick={() => setIsOpen(!isOpen)}>
-              {isOpen && <X size={24} />}
-            </button>
-            <button onClick={() => setIsOpen(!isOpen)}>
-              {!isOpen && user && <Menu size={24} />}
-            </button>
-            {!isOpen && !user && (location.pathname.startsWith("/login") || location.pathname.startsWith("/register")) && <Link to="/" className="hover:text-cyan-50 font-bold">Home</Link>}
-            {!isOpen && !user && location.pathname.startsWith("/login") && <Link to="/register" className="hover:text-cyan-50 font-bold">Register</Link>}
-            {!isOpen && !user && location.pathname.startsWith("/register") && <Link to="/login" className="hover:text-cyan-50 font-bold">Login</Link>}
-            {!isOpen && !user && location.pathname.startsWith("/") && !(location.pathname.startsWith("/login") || location.pathname.startsWith("/register")) && <Link to="/login" className="hover:text-cyan-50 font-bold">Login</Link>}
-            {!isOpen && !user && location.pathname.startsWith("/") && !(location.pathname.startsWith("/login") || location.pathname.startsWith("/register")) && <Link to="/register" className="hover:text-cyan-50 font-bold">Register</Link>}
-          </div>
+          <button onClick={() => setIsOpen(!isOpen)}>
+            {isOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
         </div>
       </div>
 
+      {/* ---------------- MOBILE MENU ---------------- */}
       {isOpen && (
         <div className="md:hidden flex flex-col mt-2 text-[14px] space-y-2">
-          <Link to="/home" className="hover:text-cyan-50" onClick={() => setIsOpen(false)}>Home</Link>
-          <Link to="/articles" className="hover:text-cyan-50" onClick={() => setIsOpen(false)}>Articles</Link>
-          <Link to="/contact" className="hover:text-cyan-50" onClick={() => setIsOpen(false)}>Contact</Link>
-          {user && admin && !(location.pathname.startsWith("/admin")) &&
-            <Link to="/admin" className="hover:text-cyan-50">Admin</Link>}
-          {admin && location.pathname.startsWith("/admin") && 
-            ( <button onClick={handleLogout} className='text-left hover:text-red-500 transition'>Logout</button> )}
-          {user && !(location.pathname.startsWith("/admin")) &&
-            ( <button onClick={handleUserLogout} className='text-left hover:text-red-500 transition'>Logout</button> )}
+          {user && (
+            <>
+              <Link
+                to="/home"
+                onClick={() => setIsOpen(false)}
+                className={isActive("/home") ? "text-blue-700 font-bold" : "hover:text-cyan-50"}
+              >
+                Home
+              </Link>
+              <Link
+                to="/articles"
+                onClick={() => setIsOpen(false)}
+                className={isActive("/articles") ? "text-blue-700 font-bold" : "hover:text-cyan-50"}
+              >
+                Articles
+              </Link>
+              <Link
+                to="/contact"
+                onClick={() => setIsOpen(false)}
+                className={isActive("/contact") ? "text-blue-700 font-bold" : "hover:text-cyan-50"}
+              >
+                Contact
+              </Link>
+            </>
+          )}
+
+          {user && admin && !location.pathname.startsWith("/admin") && (
+            <Link
+              to="/admin"
+              onClick={() => setIsOpen(false)}
+              className={isActive("/admin") ? "text-blue-700 font-bold" : "hover:text-cyan-50"}
+            >
+              Admin
+            </Link>
+          )}
+
+          {admin && location.pathname.startsWith("/admin") && (
+            <button onClick={handleLogout} className="text-left hover:text-red-500 transition">
+              Logout
+            </button>
+          )}
+
+          {user && !location.pathname.startsWith("/admin") && (
+            <button onClick={handleUserLogout} className="text-left hover:text-red-500 transition">
+              Logout
+            </button>
+          )}
         </div>
       )}
     </nav>
   );
 };
 
-
 export default Navbar;
-

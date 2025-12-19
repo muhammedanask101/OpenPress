@@ -179,6 +179,8 @@ const ViewArticle = () => {
   const navigate = useNavigate();
   const requestedSlugRef = useRef(null);
 
+  const hasFetchedRef = useRef(false);
+
   // Support multiple possible slice shapes (currentArticle vs article)
   const articlesSlice = useSelector((s) => s.articles || {});
   const article = articlesSlice.currentArticle ?? articlesSlice.article ?? null;
@@ -210,32 +212,37 @@ const ViewArticle = () => {
 
 
 
-  // Fetch once per slug (ref guard prevents double-dispatch in dev StrictMode)
-  useEffect(() => {
-    if (!slug) return;
-    if (requestedSlugRef.current === slug) return;
+// Fetch article by slug
+useEffect(() => {
+  if (!slug) return;
 
-    requestedSlugRef.current = slug;
-    dispatch(getArticleBySlug(slug));
+  hasFetchedRef.current = false;
 
-    return () => {
-      requestedSlugRef.current = null;
-      dispatch(reset());
-    };
-  }, [slug, dispatch]);
+  dispatch(getArticleBySlug(slug)).then(() => {
+    hasFetchedRef.current = true;
+  });
+}, [slug, dispatch]);
 
-  // Handle errors and not-found after request completes
-  useEffect(() => {
-    if (isError) {
-      toast.error(message || 'Failed to load article');
-    }
 
-    // Only redirect / show not-found after loading finishes
-    if (!isLoading && isSuccess && !article) {
-      toast.info('Article not found');
-      navigate('/articles', { replace: true });
-    }
-  }, [isError, isLoading, isSuccess, article, message, navigate]);
+useEffect(() => {
+  if (
+    hasFetchedRef.current &&
+    !articlesSlice.isLoadingItem &&
+    !article
+  ) {
+    toast.info('Article not found');
+    navigate('/articles', { replace: true });
+  }
+}, [article, articlesSlice.isLoadingItem, navigate]);
+
+
+useEffect(() => {
+  if (articlesSlice.isError) {
+    toast.error(articlesSlice.message || 'Failed to load article');
+  }
+}, [articlesSlice.isError, articlesSlice.message]);
+
+
 
   if (isLoading) return <FallbackLoading />;
 

@@ -98,9 +98,6 @@ export default function Home() {
     setLocalMessage("");
     dispatch(getArticles());
     if (userId) dispatch(getMyArticles());
-    return () => {
-      dispatch(reset());
-    };
   }, [dispatch, userId]);
 
   
@@ -249,6 +246,45 @@ export default function Home() {
           </div>
         </section>
 
+                {/* Your Articles: editable list */}
+        <section>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-semibold">Your Articles</h2>
+            <div className="text-sm text-gray-500">Manage your posts</div>
+          </div>
+
+          {!userId ? (
+            <div className="p-4 bg-yellow-50 border rounded text-yellow-800">
+              Sign in to create and manage your articles.
+            </div>
+          ) : isLoadingList && !myAuthored?.length ? (
+            <div className="py-6 text-center">Loading your articles…</div>
+          ) : myAuthored && myAuthored.length ? (
+            <div className="space-y-3">
+              {myAuthored.map(a => {
+                const id = a._id || a.id;
+                return (
+                  <div key={id} className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 p-4 bg-white rounded shadow">
+                    <div className="flex-1">
+                      <div className="font-medium text-lg">{a.title}</div>
+                      <div className="text-xs text-gray-500 mt-1 line-clamp-2">{a.preview || a.excerpt || (a.body && a.body.slice(0, 120))}</div>
+                      <div className="mt-2 text-xs text-gray-400">Status: <span className="font-medium text-gray-700">{a.status}</span></div>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <button onClick={() => editArticle(a)} className="px-3 py-1 rounded bg-yellow-500 text-white">Edit</button>
+                      <button onClick={() => confirmAndDelete(a)} className="px-3 py-1 rounded bg-red-600 text-white">Delete</button>
+                      <button onClick={() => openArticle(a)} className="px-3 py-1 rounded border">View</button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="text-sm text-gray-500">You haven't written any articles yet. <button onClick={() => navigate('/articles/create')} className="text-yellow-600 underline">Write one</button></div>
+          )}
+        </section>
+
         {/* Featured */}
         <section>
           <div className="flex items-center justify-between mb-4">
@@ -328,44 +364,6 @@ export default function Home() {
           )}
         </section>
 
-        {/* Your Articles: editable list */}
-        <section>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-semibold">Your Articles</h2>
-            <div className="text-sm text-gray-500">Manage your posts</div>
-          </div>
-
-          {!userId ? (
-            <div className="p-4 bg-yellow-50 border rounded text-yellow-800">
-              Sign in to create and manage your articles.
-            </div>
-          ) : isLoadingList && !myAuthored?.length ? (
-            <div className="py-6 text-center">Loading your articles…</div>
-          ) : myAuthored && myAuthored.length ? (
-            <div className="space-y-3">
-              {myAuthored.map(a => {
-                const id = a._id || a.id;
-                return (
-                  <div key={id} className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 p-4 bg-white rounded shadow">
-                    <div className="flex-1">
-                      <div className="font-medium text-lg">{a.title}</div>
-                      <div className="text-xs text-gray-500 mt-1 line-clamp-2">{a.preview || a.excerpt || (a.body && a.body.slice(0, 120))}</div>
-                      <div className="mt-2 text-xs text-gray-400">Status: <span className="font-medium text-gray-700">{a.status}</span></div>
-                    </div>
-
-                    <div className="flex gap-2">
-                      <button onClick={() => editArticle(a)} className="px-3 py-1 rounded bg-yellow-500 text-white">Edit</button>
-                      <button onClick={() => confirmAndDelete(a)} className="px-3 py-1 rounded bg-red-600 text-white">Delete</button>
-                      <button onClick={() => openArticle(a)} className="px-3 py-1 rounded border">View</button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="text-sm text-gray-500">You haven't written any articles yet. <button onClick={() => navigate('/articles/create')} className="text-yellow-600 underline">Write one</button></div>
-          )}
-        </section>
 
         {/* Extras: categories, get involved, support */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
