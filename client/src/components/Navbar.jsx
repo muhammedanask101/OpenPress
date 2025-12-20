@@ -74,7 +74,7 @@ const Navbar = () => {
 
           {!user && location.pathname.startsWith("/login") && (
             <Link to="/register" className={isActive("/register") ? activeClass : inactiveClass}>
-              Register
+              Sign up
             </Link>
           )}
 
@@ -91,7 +91,7 @@ const Navbar = () => {
                   Login
                 </Link>
                 <Link to="/register" className={isActive("/register") ? activeClass : inactiveClass}>
-                  Register
+                  Sign up
                 </Link>
               </>
             )}
@@ -141,7 +141,7 @@ const Navbar = () => {
 
             {location.pathname !== "/register" && (
               <Link to="/register" className={isActive("/register") ? activeClass : inactiveClass}>
-                Register
+                Sign up
               </Link>
             )}
           </div>
