@@ -1,14 +1,9 @@
-import Login from '../components/Login';
-// import assets from '../assets/assets';
+import UserLogIn from "../components/UserLogIn";
 
-export default function AdminLogin() {
-    return (
-        <div /* style={{
-            backgroundImage: `url(${assets.register})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center'
-        }} */>
-        <Login />
-        </div>
-    )
+export default function LoginPage() {
+  return (
+    <div className="min-h-screen text-gray-900 flex items-center justify-center px-4">
+      <UserLogIn />
+    </div>
+  );
 }
