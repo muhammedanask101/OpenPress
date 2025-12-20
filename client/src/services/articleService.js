@@ -36,17 +36,37 @@ const getAdminToken = () => {
   }
 };
 
-// request interceptor: attach token automatically if present
-api.interceptors.request.use((config) => {
-  const adminToken = getAdminToken();
-  const userToken = getUserToken();
-  const token = adminToken || userToken;
-  if (token) {
-    config.headers = config.headers || {};
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-}, (err) => Promise.reject(err));
+// request interceptor: attach correct token (admin vs user)
+api.interceptors.request.use(
+  (config) => {
+    const adminRaw = localStorage.getItem('admin');
+    const userRaw = localStorage.getItem('user');
+
+    let adminToken = null;
+    let userToken = null;
+
+    try {
+      adminToken = adminRaw ? JSON.parse(adminRaw)?.token : null;
+    } catch {}
+
+    try {
+      userToken = userRaw ? JSON.parse(userRaw)?.token : null;
+    } catch {}
+
+    // Admin routes ONLY
+    if (config.url?.includes('/admin') && adminToken) {
+      config.headers.Authorization = `Bearer ${adminToken}`;
+    }
+    // User routes (default)
+    else if (userToken) {
+      config.headers.Authorization = `Bearer ${userToken}`;
+    }
+
+    return config;
+  },
+  (err) => Promise.reject(err)
+);
+
 
 // helper to normalize axios error message
 function extractErrorMessage(error) {
