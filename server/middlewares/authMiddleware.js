@@ -44,7 +44,17 @@ const authEither = asyncHandler(async (req, res, next) => {
       }
     }
   } catch (err) {
+    console.error(err.name, err.message);
+
+    if (err.name === 'TokenExpiredError') {
+      res.status(401);
+      throw new Error('Token expired');
+    }
+
+    res.status(401);
+    throw new Error('Not authorized');
   }
+
 
 
   try {
@@ -58,7 +68,17 @@ const authEither = asyncHandler(async (req, res, next) => {
       }
     }
   } catch (err) {
+    console.error(err.name, err.message);
+
+    if (err.name === 'TokenExpiredError') {
+      res.status(401);
+      throw new Error('Token expired');
+    }
+
+    res.status(401);
+    throw new Error('Not authorized');
   }
+
 
   return next();
 });
@@ -87,10 +107,17 @@ const protect = asyncHandler(async (req, res, next) => {
     req.admin = admin;
     next();
   } catch (err) {
-    console.error(err);
+    console.error(err.name, err.message);
+
+    if (err.name === 'TokenExpiredError') {
+      res.status(401);
+      throw new Error('Token expired');
+    }
+
     res.status(401);
-    throw new Error('You are not authorized');
+    throw new Error('Not authorized');
   }
+
 });
 
 
@@ -123,10 +150,17 @@ const userprotect = asyncHandler(async (req, res, next) => {
     req.user = user;
     next();
   } catch (err) {
-    console.error(err);
+    console.error(err.name, err.message);
+
+    if (err.name === 'TokenExpiredError') {
+      res.status(401);
+      throw new Error('Token expired');
+    }
+
     res.status(401);
     throw new Error('Not authorized');
   }
+
 });
 
 module.exports = { authEither, protect, userprotect };

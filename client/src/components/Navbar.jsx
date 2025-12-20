@@ -117,10 +117,37 @@ const Navbar = () => {
 
         {/* ---------------- MOBILE TOGGLE ---------------- */}
         <div className="md:hidden text-md mr-2">
-          <button onClick={() => setIsOpen(!isOpen)}>
-            {isOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+          {user && (
+            <button onClick={() => setIsOpen(!isOpen)}>
+              {isOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          )}
         </div>
+
+        {/* -------- PUBLIC MOBILE LINKS (INLINE) -------- */}
+        {!user && (
+          <div className="md:hidden flex gap-4 text-lg font-bold mr-2">
+            {location.pathname !== "/" && (
+              <Link to="/" className={isActive("/") ? activeClass : inactiveClass}>
+                Home
+              </Link>
+            )}
+
+            {location.pathname !== "/login" && (
+              <Link to="/login" className={isActive("/login") ? activeClass : inactiveClass}>
+                Login
+              </Link>
+            )}
+
+            {location.pathname !== "/register" && (
+              <Link to="/register" className={isActive("/register") ? activeClass : inactiveClass}>
+                Register
+              </Link>
+            )}
+          </div>
+        )}
+
+
       </div>
 
       {/* ---------------- MOBILE MENU ---------------- */}

@@ -1,5 +1,7 @@
-// src/services/articleService.js
 import axios from 'axios';
+import store from '../app/store';
+import { logoutUser } from '../slices/userSlice';
+import { logoutAdmin } from '../slices/adminSlice';
 
 const BACKEND = import.meta.env.VITE_BACKEND_URL?.replace(/\/$/, '') || 'http://localhost:3000';
 const API_PATH = '/api/articles';
@@ -65,6 +67,37 @@ api.interceptors.request.use(
     return config;
   },
   (err) => Promise.reject(err)
+);
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const status = error?.response?.status;
+    const message = error?.response?.data?.message || '';
+
+    // Token expired / invalid
+    if (
+      status === 401 &&
+      (message.toLowerCase().includes('expired') ||
+       message.toLowerCase().includes('not authorized'))
+    ) {
+      // Clear storage
+      localStorage.removeItem('user');
+      localStorage.removeItem('admin');
+
+      // Clear redux
+      store.dispatch(logoutUser());
+      store.dispatch(logoutAdmin());
+
+      // Optional: toast
+      // toast.info('Session expired. Please login again.');
+
+      // Redirect safely
+      window.location.href = '/login';
+    }
+
+    return Promise.reject(error);
+  }
 );
 
 

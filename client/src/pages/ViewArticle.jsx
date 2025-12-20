@@ -156,7 +156,7 @@ function renderArticleBody(body, mediaMap) {
 
       {referenceList.length > 0 && (
         <section className="mt-14 pt-6 border-t">
-          <h3 className="text-lg font-semibold mb-4">References</h3>
+          <h3 className="text-lg font-semibold mb-4">References and Footnotes</h3>
           <ol className="list-decimal ml-6 space-y-2 text-sm">
             {referenceList.map(([id, text]) => (
               <li key={id} id={`ref-${id}`}>
