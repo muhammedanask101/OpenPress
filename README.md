@@ -69,27 +69,6 @@ This ensures community participation while maintaining content quality.
 
 ---
 
-## 📂 Project Structure
-
-OpenPress/
-│
-├── client/ # React frontend (Redux + Vite)
-│ ├── components/
-│ ├── pages/
-│ ├── services/
-│ ├── slices/
-│ └── utils/
-│
-├── server/ # Express backend
-│ ├── controllers/
-│ ├── models/
-│ ├── routes/
-│ ├── middlewares/
-│ ├── configs/
-│ └── utils/
-│
-└── README.md
-
 ## 🛠️ Local Development Setup
 
 ### 1️⃣ Clone the repository
