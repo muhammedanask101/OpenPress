@@ -134,12 +134,12 @@ export default function Sitout() {
         <div className="flex items-center justify-between gap-4">
           <div>
             <h1 className="hidden md:block text-2xl md:text-4xl font-serif font-bold text-red-700">
-              Kerala Muslim Community
+              A Community of Writers
             </h1>
             <h1 className="block md:hidden text-2xl md:text-4xl font-serif font-bold text-red-700">
-                A Community of Keralite Muslims
+                A Community of Writers
             </h1>
-            <p className="text-sm md:text-base text-gray-600 mt-2 md:mt-1">Connecting duas & knowledge across Kerala</p>
+            <p className="text-sm md:text-base text-gray-600 mt-2 md:mt-1">Connecting people & knowledge across the World</p>
           </div>
 
           <div className="flex items-center gap-3">
@@ -158,8 +158,8 @@ export default function Sitout() {
                 About Us
               </h2>
               <p className="mt-3 text-base text-red-800">
-                We are a community platform that connects Muslims in <span className="font-semibold text-yellow-600">Kerala</span>.
-                Share advice, write guides, promote learning, and ask questions with us. Together we make a supportive space to share knowledge and to ask questions!
+                We are a community platform that connects Writers across the <span className="font-semibold text-yellow-600">World</span>.
+                Write articles, promote learning, and ask questions with us. Together we make a supportive space to share knowledge and to questions!
               </p>
 
               <ul className="mt-4 space-y-2 text-sm text-red-900">
@@ -270,22 +270,14 @@ export default function Sitout() {
         </section>
 
         <section className="grid grid-cols-1 md:grid-cols-3 mt-10 gap-4">
-          {/* <div className="bg-white rounded p-4 shadow">
-            <h4 className="font-semibold mb-2">Categories</h4>
-            <ul className="text-sm text-gray-600 space-y-1">
-              <li>Local News</li>
-              <li>Events</li>
-              <li>Guides</li>
-              <li>Community Stories</li>
-            </ul>
-          </div> */}
+
 
           <div className="bg-white rounded p-4 shadow">
             <h4 className="font-semibold mb-2">Get Involved</h4>
             <p className="text-sm text-gray-600">Write, moderate or help answer questions? sign up to volunteer.</p>
             <div className="mt-3">
               <button className="px-3 py-2 bg-yellow-500 text-white rounded">
-                <a href="https://discord.gg/GnBeB7bhvc" target="_blank" rel="noopener noreferrer">Volunteer</a>
+                <p>Volunteer</p>
               </button>
             </div>
           </div>
@@ -301,7 +293,6 @@ export default function Sitout() {
         </section>
       </main>
 
-      {/* Local toast / message */}
       {localMessage && (
         <div className="fixed bottom-6 right-6 bg-white border p-3 rounded shadow text-sm z-50">
           <div className="flex items-center gap-3">

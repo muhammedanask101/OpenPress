@@ -62,7 +62,7 @@ const UserLogIn = () => {
               User Login
             </h1>
             <p className="mt-1 text-sm text-gray-600">
-              Kerala Muslim Community
+              OpenPress Community
             </p>
           </div>
 

@@ -64,7 +64,7 @@ const UserRegister = () => {
               Create account
             </h1>
             <p className="mt-1 text-sm text-gray-600">
-              Join the Kerala Muslim Community
+              Join the OpenPress Community
             </p>
           </div>
 

@@ -47,7 +47,7 @@ const Navbar = () => {
     <nav className="bg-white text-black p-3 md:p-6 border-b border-black md:border-b-2">
       <div className="flex justify-between items-center">
         <div className="md:font-extrabold font-bold text-lg md:ml-4 md:text-2xl tracking-wide">
-          <Link to="/">Kerala Muslims</Link>
+          <Link to="/">Open Press</Link>
         </div>
 
         {/* ---------------- DESKTOP ---------------- */}

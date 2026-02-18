@@ -7,7 +7,6 @@ const helmet = require('helmet');
 const cors = require('cors');
 const morgan = require('morgan');
 const hpp = require('hpp');
-// const maintenanceMode = require('./middlewares/maintenanceMiddleware');
 
 require('dotenv').config();
 
@@ -21,7 +20,7 @@ if (process.env.NODE_ENV !== 'test') {
 }
 app.use(helmet());
 app.use(cors({
-  origin: ['http://localhost:5173', 'https://www.keralamuslims.org', 'https://keralamuslims.org', 'zaman-git-main-muhammedanask101s-projects.vercel.app', 'zaman-eoa52nquc-muhammedanask101s-projects.vercel.app'],
+  origin: ['http://localhost:5173', 'openpress-git-main-muhammedanask101s-projects.vercel.app'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
@@ -30,7 +29,6 @@ app.use(express.json({ limit: '1mb' }));
 app.use(hpp());
 app.use(sanitizeMiddleware);
 app.use('/api', apiLimiter);
-// app.use maintenance middleware
 app.get("/", (req, res) => {
   res.send("Backend is alive...");
 });

@@ -9,7 +9,7 @@ const Footer = () => {
           {/* Identity */}
           <div>
             <p className="text-lg font-semibold tracking-wide text-white">
-              Kerala Muslims
+              Open Press
             </p>
             <p className="mt-1 text-sm text-white/70 max-w-md">
               A non-profit community platform
@@ -41,10 +41,10 @@ const Footer = () => {
         {/* Bottom row */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 text-xs text-white/60">
           <p>
-            © {new Date().getFullYear()} Kerala Muslims. All rights reserved.
+            © {new Date().getFullYear()} OpenPress. All rights reserved.
           </p>
           <p className="italic">
-            Built with care • Serving the Ummah
+            Built with care • Serving the world
           </p>
         </div>
 

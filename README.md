@@ -1,6 +1,4 @@
-# Kerala Muslims
 
-A **Non-Profit Platform** built by **Muhammed Anas K** to bring archive the history, culture and religious beliefs of Muslims in Kerala.  
 This repository contains both **frontend (client)** and **backend (server)** code.  
 
 ---
