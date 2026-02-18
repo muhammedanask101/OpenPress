@@ -2,42 +2,80 @@
 This repository contains both **frontend (client)** and **backend (server)** code.  
 
 ---
+# 📰 OpenPress
 
-## ✨ Features
+**OpenPress** is a community-driven publishing platform where users can write, format and submit articles and admins review and approve them before publication.
 
-- ⚡ Fast and responsive design  
-- 🧱 Built with the MERN stack (MongoDB, Express, React, Node.js)  
-- 📱 Mobile-first UI  
-- 💬 Post and Edit Articles 
-- 🚀 Custom admin panel and authentication  
-- 🗂️ Clean and maintainable folder structure  
+It combines open contribution with structured moderation to ensure content quality.
+
+
+## 📌 Features
+
+- ✍️ Create, edit and read articles
+- 📝 Submit articles for review
+- 🔍 Search and filter by title and content.
+- ✅ Admin approval / rejection workflow
+- 🔐 Authentication with User and Admin separation.
+- 📱 Responsive and modern UI
+- ⚡ Fast development setup using modern tooling
+
+## 🧠 How It Works
+
+1. Users register and log in.
+2. Users create and submit articles.
+3. Submitted articles go into a review state.
+4. Admin approves or rejects the article.
+5. Approved articles become publicly visible.
+
+This ensures community participation while maintaining content quality.
 
 ---
 
-## 🧩 Tech Stack
+## 🏗️ Tech Stack
 
 | Layer | Technology |
 |-------|-------------|
-| Frontend | React + Vite |
+| Frontend | React + Redux + Vite |
 | Backend | Node.js + Express |
 | Database | MongoDB |
 | Styling | Tailwind CSS |
-| Deployment | Vercel |
+| Deployment | Vercel + Render |
 
 ---
 
-## 🛠️ Getting Started
+### Frontend
+- React (Vite)
+- Redux Toolkit (Slices architecture)
+- Tailwind CSS
+- React Router
 
-### Prerequisites
+### Backend
+- Node.js
+- Express.js
+- MongoDB (Mongoose)
+- JWT Authentication
 
-Make sure you have the following installed:
+### Security & Middleware
+- Auth middleware
+- Role-based middleware
+- Rate limiting
+- Input sanitization
+- Error handling middleware
 
-- [Node.js](https://nodejs.org/) (v14 or higher)
-- pnpm
-- MongoDB Database
+### Deployment
+- Vercel-ready configuration
+- Environment-based configuration
+- Render backend configuration
 
-#### 1️⃣ Clone the Repository
+---
+
+## 🛠️ Local Development Setup
+
+### 1️⃣ Clone the repository
 
 ```bash
-git clone https://github.com/muhammedanask101/md_anas_portfolio.git
-cd md_anas_portfolio
+git clone https://github.com/muhammedanask101/OpenPress.git
+cd OpenPress
+```
+
+
