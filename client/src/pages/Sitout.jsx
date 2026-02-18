@@ -183,7 +183,7 @@ export default function Sitout() {
               <div className="mt-3 space-y-3">
                 <button onClick={() => navigate("/login")} className="w-full py-2 rounded bg-yellow-500 text-white">Write an article</button>
                 <button className="w-full py-2 rounded border border-red-700 text-red-700">
-                    <a href="https://discord.gg/GnBeB7bhvc" target="_blank" rel="noopener noreferrer">Discord Server</a>
+                    <a href="https://www.google.com" target="_blank" rel="noopener noreferrer">Community Platform</a>
                 </button>
                 <button onClick={() => navigate("/login")} className="w-full py-2 rounded bg-red-700 text-white">Learn more</button>
               </div>

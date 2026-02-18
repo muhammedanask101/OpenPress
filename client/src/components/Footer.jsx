@@ -25,7 +25,7 @@ const Footer = () => {
               Contact
             </a>
             <a
-              href="https://discord.gg/GnBeB7bhvc"
+              href="https://www.google.com"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-white transition"

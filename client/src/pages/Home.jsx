@@ -372,7 +372,7 @@ export default function Home() {
             <p className="text-sm text-gray-600">Write, moderate or help answer questions? sign up to volunteer.</p>
             <div className="mt-3">
               <button className="px-3 py-2 bg-yellow-500 text-white rounded">
-                <a href="https://discord.gg/GnBeB7bhvc" target="_blank" rel="noopener noreferrer">Volunteer</a>
+                <a href="https://www.google.com" target="_blank" rel="noopener noreferrer">Volunteer</a>
               </button>
             </div>
           </div>
