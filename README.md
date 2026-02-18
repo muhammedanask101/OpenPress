@@ -31,6 +31,65 @@ This ensures community participation while maintaining content quality.
 
 ---
 
+## 🏗️ Tech Stack
+
+| Layer | Technology |
+|-------|-------------|
+| Frontend | React + Redux + Vite |
+| Backend | Node.js + Express |
+| Database | MongoDB |
+| Styling | Tailwind CSS |
+| Deployment | Vercel + Render |
+
+---
+
+### Frontend
+- React (Vite)
+- Redux Toolkit (Slices architecture)
+- Tailwind CSS
+- React Router
+
+### Backend
+- Node.js
+- Express.js
+- MongoDB (Mongoose)
+- JWT Authentication
+
+### Security & Middleware
+- Auth middleware
+- Role-based middleware
+- Rate limiting
+- Input sanitization
+- Error handling middleware
+
+### Deployment
+- Vercel-ready configuration
+- Environment-based configuration
+- Render backend configuration
+
+---
+
+## 📂 Project Structure
+
+OpenPress/
+│
+├── client/ # React frontend (Redux + Vite)
+│ ├── components/
+│ ├── pages/
+│ ├── services/
+│ ├── slices/
+│ └── utils/
+│
+├── server/ # Express backend
+│ ├── controllers/
+│ ├── models/
+│ ├── routes/
+│ ├── middlewares/
+│ ├── configs/
+│ └── utils/
+│
+└── README.md
+
 ## 🛠️ Local Development Setup
 
 ### 1️⃣ Clone the repository
@@ -40,14 +99,4 @@ git clone https://github.com/muhammedanask101/OpenPress.git
 cd OpenPress
 ```
 
-## 🧩 Tech Stack
 
-| Layer | Technology |
-|-------|-------------|
-| Frontend | React + Vite |
-| Backend | Node.js + Express |
-| Database | MongoDB |
-| Styling | Tailwind CSS |
-| Deployment | Vercel | Render |
-
----
